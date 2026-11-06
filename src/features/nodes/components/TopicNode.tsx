@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { NodeProps, Position } from '@xyflow/react';
-import { MindNodeData } from '@/features/nodes/types/node.types';
+import { MindNodeType } from '@/features/nodes/types/node.types';
 import { NodeHandle } from './NodeHandle';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 import { ChevronRight, Plus } from 'lucide-react';
 
-export const TopicNode: React.FC<NodeProps<MindNodeData>> = ({ id, data, selected }) => {
+export const TopicNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selected }) => {
   const { updateNodeData, addChildNode, toggleCollapse, edges } = useMindMapStore();
   const [isEditing, setIsEditing] = useState(false);
   const [label, setLabel] = useState(data.label);

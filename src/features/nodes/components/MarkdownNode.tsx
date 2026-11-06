@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { NodeProps, Position } from '@xyflow/react';
-import { MindNodeData } from '@/features/nodes/types/node.types';
+import { MindNodeType } from '@/features/nodes/types/node.types';
 import { NodeHandle } from './NodeHandle';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 import { FileText, Edit2, Check } from 'lucide-react';
 
-export const MarkdownNode: React.FC<NodeProps<MindNodeData>> = ({ id, data, selected }) => {
+export const MarkdownNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selected }) => {
   const updateNodeData = useMindMapStore((s) => s.updateNodeData);
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(data.markdown || '');

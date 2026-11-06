@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { NodeProps, Position } from '@xyflow/react';
-import { MindNodeData } from '@/features/nodes/types/node.types';
+import { MindNodeType, ChecklistItem } from '@/features/nodes/types/node.types';
 import { NodeHandle } from './NodeHandle';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 import { CheckSquare, Plus, Trash2 } from 'lucide-react';
 
-export const ChecklistNode: React.FC<NodeProps<MindNodeData>> = ({ id, data, selected }) => {
+export const ChecklistNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selected }) => {
   const updateNodeData = useMindMapStore((s) => s.updateNodeData);
   const [newItemText, setNewItemText] = useState('');
-  const checklist = data.checklist || [];
+  const checklist = (data.checklist as ChecklistItem[]) || [];
 
   const completedCount = checklist.filter((item) => item.completed).length;
   const progressPercent = checklist.length > 0 ? Math.round((completedCount / checklist.length) * 100) : 0;
@@ -22,7 +22,7 @@ export const ChecklistNode: React.FC<NodeProps<MindNodeData>> = ({ id, data, sel
 
   const addItem = () => {
     if (!newItemText.trim()) return;
-    const nextList = [
+    const nextList: ChecklistItem[] = [
       ...checklist,
       { id: Date.now().toString(), text: newItemText.trim(), completed: false },
     ];

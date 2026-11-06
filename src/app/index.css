@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #09090b;
+  color: #f4f4f5;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* React Flow customizations */
+.react-flow__handle {
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.react-flow__handle:hover {
+  transform: scale(1.3);
+}
+
+.react-flow__edge-path {
+  transition: stroke 0.2s ease, stroke-width 0.2s ease;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #3b82f6 !important;
+  stroke-width: 2.5px !important;
+}
+
+.react-flow__controls button {
+  background-color: #18181b !important;
+  border-bottom: 1px solid #27272a !important;
+  fill: #a1a1aa !important;
+  color: #a1a1aa !important;
+}
+
+.react-flow__controls button:hover {
+  background-color: #27272a !important;
+  fill: #f4f4f5 !important;
+  color: #f4f4f5 !important;
+}

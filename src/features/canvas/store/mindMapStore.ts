@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { applyNodeChanges, applyEdgeChanges, addEdge, Node, Edge } from '@xyflow/react';
-import { MindMapStoreState, LayoutDirection, ConnectorType } from './mindMapStore.types';
+import { MindMapStoreState, ConnectorType } from './mindMapStore.types';
 import { initialNodes, initialEdges } from './initialTemplate';
 import { getAllDescendantIds, buildEdge, createNewChildNode } from './treeHelpers';
 import { runMindMapLayout } from '@/features/layout/layoutEngine';

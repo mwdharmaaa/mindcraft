@@ -1,3 +1,5 @@
+import { Node } from '@xyflow/react';
+
 export type NodeTypeKind = 'root' | 'topic' | 'checklist' | 'markdown';
 
 export type NodeShape = 'rounded' | 'pill' | 'rectangle' | 'minimal';
@@ -12,7 +14,7 @@ export interface ChecklistItem {
   completed: boolean;
 }
 
-export interface MindNodeData {
+export interface MindNodeData extends Record<string, unknown> {
   label: string;
   kind: NodeTypeKind;
   shape?: NodeShape;
@@ -24,5 +26,6 @@ export interface MindNodeData {
   tags?: string[];
   priority?: NodePriority;
   parentId?: string | null;
-  [key: string]: unknown;
 }
+
+export type MindNodeType = Node<MindNodeData>;
