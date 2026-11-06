@@ -57,7 +57,10 @@ export const RootNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selected
           />
         ) : (
           <span
-            onDoubleClick={() => setIsEditing(true)}
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              setIsEditing(true);
+            }}
             className="text-zinc-100 font-semibold text-sm tracking-tight cursor-text select-text"
           >
             {data.label}

@@ -79,7 +79,10 @@ export const TopicNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selecte
           />
         ) : (
           <span
-            onDoubleClick={() => setIsEditing(true)}
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              setIsEditing(true);
+            }}
             className="text-xs font-medium text-zinc-200 select-text cursor-text"
           >
             {data.label}

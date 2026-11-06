@@ -26,6 +26,7 @@ export interface MindMapStoreState {
   updateNodeData: (id: string, data: Partial<MindNodeData>) => void;
   addChildNode: (parentId?: string) => void;
   addSiblingNode: (nodeId?: string) => void;
+  addCardAtPosition: (position: { x: number; y: number }, kind?: 'topic' | 'checklist' | 'markdown') => void;
   deleteSubtree: (nodeId: string) => void;
   toggleCollapse: (nodeId: string) => void;
   applyLayout: (direction?: LayoutDirection) => void;

@@ -158,6 +158,67 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
     });
   },
 
+  addCardAtPosition: (position, kind = 'topic') => {
+    const state = get();
+    const newId = `card-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const selectedParent = state.selectedNodeId
+      ? state.nodes.find((n) => n.id === state.selectedNodeId)
+      : null;
+
+    const cardColor = selectedParent?.data.color || (
+      kind === 'checklist' ? '#10b981' :
+      kind === 'markdown' ? '#8b5cf6' :
+      '#3b82f6'
+    );
+
+    const defaultTitle =
+      kind === 'checklist' ? 'Plot Tasks' :
+      kind === 'markdown' ? 'Scene Notes' :
+      'Story Card';
+
+    const newNode: Node<MindNodeData> = {
+      id: newId,
+      type: kind,
+      position,
+      data: {
+        label: defaultTitle,
+        kind,
+        color: cardColor,
+        parentId: selectedParent?.id,
+        shape: 'rounded',
+        priority: 'none',
+        ...(kind === 'checklist' ? { checklist: [{ id: '1', text: 'Opening beat', completed: false }] } : {}),
+        ...(kind === 'markdown' ? { markdown: '' } : {}),
+      },
+    };
+
+    let nextEdges = state.edges;
+    if (selectedParent) {
+      const rawEdge = buildEdge(
+        selectedParent.id,
+        newId,
+        state.connectorType,
+        cardColor,
+        selectedParent.position,
+        position
+      );
+      nextEdges = optimizeEdgeHandles([...state.nodes, newNode], [...state.edges, rawEdge]);
+    }
+
+    const nextNodes = [...state.nodes, newNode];
+
+    set({
+      nodes: nextNodes,
+      edges: nextEdges,
+      selectedNodeId: newId,
+      history: [
+        ...state.history.slice(0, state.historyIndex + 1),
+        { nodes: nextNodes, edges: nextEdges },
+      ],
+      historyIndex: state.historyIndex + 1,
+    });
+  },
+
   deleteSubtree: (nodeId) => {
     const state = get();
     const targetNode = state.nodes.find((n) => n.id === nodeId);

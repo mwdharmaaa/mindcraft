@@ -54,7 +54,10 @@ export const MarkdownNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, sele
         />
       ) : (
         <div
-          onDoubleClick={() => setIsEditing(true)}
+          onDoubleClick={(e) => {
+            e.stopPropagation();
+            setIsEditing(true);
+          }}
           className="text-xs text-zinc-400 font-sans leading-relaxed whitespace-pre-wrap max-h-36 overflow-y-auto cursor-text select-text"
         >
           {data.markdown || 'Double click to add detailed notes or documentation...'}

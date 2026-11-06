@@ -1,6 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   ReactFlow,
+  ReactFlowProvider,
+  useReactFlow,
   Controls,
   MiniMap,
   Background,
@@ -14,8 +16,9 @@ import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 import { nodeTypes } from '@/features/nodes/nodeTypes';
 import { useKeyboardNavigation } from '@/features/canvas/hooks/useKeyboardNavigation';
 import { CanvasWheelController } from './CanvasWheelController';
+import { FloatingCardMenu } from './FloatingCardMenu';
 
-export const MindMapCanvas: React.FC = () => {
+const MindMapCanvasInner: React.FC = () => {
   const {
     nodes,
     edges,
@@ -23,7 +26,20 @@ export const MindMapCanvas: React.FC = () => {
     onEdgesChange,
     onConnect,
     setSelectedNodeId,
+    addCardAtPosition,
   } = useMindMapStore();
+
+  const { screenToFlowPosition } = useReactFlow();
+
+  const [menuState, setMenuState] = useState<{
+    isOpen: boolean;
+    screenPos: { x: number; y: number } | null;
+    flowPos: { x: number; y: number } | null;
+  }>({
+    isOpen: false,
+    screenPos: null,
+    flowPos: null,
+  });
 
   useKeyboardNavigation();
 
@@ -38,8 +54,48 @@ export const MindMapCanvas: React.FC = () => {
     [setSelectedNodeId]
   );
 
+  const handleDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target?.closest(
+          '.react-flow__node, .react-flow__controls, .react-flow__minimap, header, button, [data-no-menu]'
+        )
+      ) {
+        return;
+      }
+
+      const flowPos = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+      setMenuState({
+        isOpen: true,
+        screenPos: { x: e.clientX, y: e.clientY },
+        flowPos,
+      });
+    },
+    [screenToFlowPosition]
+  );
+
+  const handlePaneClick = useCallback(() => {
+    if (menuState.isOpen) {
+      setMenuState((prev) => ({ ...prev, isOpen: false }));
+    }
+  }, [menuState.isOpen]);
+
+  const handleAddCard = useCallback(
+    (kind: 'topic' | 'checklist' | 'markdown') => {
+      if (menuState.flowPos) {
+        addCardAtPosition(menuState.flowPos, kind);
+      }
+      setMenuState((prev) => ({ ...prev, isOpen: false }));
+    },
+    [menuState.flowPos, addCardAtPosition]
+  );
+
   return (
-    <div className="w-full h-full relative bg-[#09090b]">
+    <div
+      className="w-full h-full relative bg-[#09090b]"
+      onDoubleClick={handleDoubleClick}
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -47,9 +103,11 @@ export const MindMapCanvas: React.FC = () => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onPaneClick={handlePaneClick}
         onSelectionChange={handleSelectionChange}
         selectionMode={SelectionMode.Partial}
         connectionMode={ConnectionMode.Loose}
+        zoomOnDoubleClick={false}
         panOnScroll={false}
         zoomOnScroll={false}
         zoomOnPinch={true}
@@ -89,6 +147,21 @@ export const MindMapCanvas: React.FC = () => {
           className="!bg-zinc-900 !border !border-zinc-800 !rounded-xl !overflow-hidden !shadow-xl"
         />
       </ReactFlow>
+
+      <FloatingCardMenu
+        isOpen={menuState.isOpen}
+        screenPos={menuState.screenPos}
+        onClose={() => setMenuState((prev) => ({ ...prev, isOpen: false }))}
+        onSelectType={handleAddCard}
+      />
     </div>
+  );
+};
+
+export const MindMapCanvas: React.FC = () => {
+  return (
+    <ReactFlowProvider>
+      <MindMapCanvasInner />
+    </ReactFlowProvider>
   );
 };

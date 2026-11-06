@@ -7,16 +7,17 @@ interface ShortcutsDialogProps {
 }
 
 const SHORTCUTS = [
-  { key: 'Tab', desc: 'Add child topic to selected node' },
-  { key: 'Enter', desc: 'Add sibling topic' },
-  { key: 'Del / Backspace', desc: 'Delete node and its descendants' },
-  { key: 'Ctrl + Z', desc: 'Undo last action' },
-  { key: 'Ctrl + Y / Shift+Z', desc: 'Redo last action' },
-  { key: 'Double Click', desc: 'Edit title inline' },
+  { key: 'Double Click Canvas', desc: 'Open quick Add Card menu' },
+  { key: 'Double Click Card', desc: 'Edit title inline' },
+  { key: 'Tab', desc: 'Add connected card to selected' },
+  { key: 'Enter', desc: 'Add sibling card' },
+  { key: 'Del / Backspace', desc: 'Delete card and descendants' },
   { key: 'Scroll Wheel', desc: 'Slide canvas up / down' },
-  { key: '2-Finger Pinch', desc: 'Zoom canvas in / out' },
   { key: 'Shift + Scroll', desc: 'Slide canvas left / right' },
+  { key: '2-Finger Pinch', desc: 'Zoom canvas in / out' },
   { key: 'Space + Drag', desc: 'Freeform pan canvas' },
+  { key: 'Ctrl + Z', desc: 'Undo last action' },
+  { key: 'Ctrl + Y', desc: 'Redo last action' },
 ];
 
 export const ShortcutsDialog: React.FC<ShortcutsDialogProps> = ({ isOpen, onClose }) => {
