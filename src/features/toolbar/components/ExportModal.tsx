@@ -3,7 +3,6 @@ import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 import { serializeToJson, deserializeFromJson } from '@/features/persistence/formatters/jsonSchema';
 import { serializeToMarkdown } from '@/features/persistence/formatters/markdownParser';
 import { X, Copy, Check, Download, Upload } from 'lucide-react';
-import { toPng } from 'html-to-image';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -33,6 +32,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
     const viewport = document.querySelector('.react-flow__viewport') as HTMLElement;
     if (!viewport) return;
     try {
+      const { toPng } = await import('html-to-image');
       const dataUrl = await toPng(viewport, {
         backgroundColor: '#09090b',
         quality: 0.95,

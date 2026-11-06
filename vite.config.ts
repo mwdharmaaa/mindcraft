@@ -10,8 +10,34 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  optimizeDeps: {
+    include: [
+      '@xyflow/react',
+      'lucide-react',
+      'zustand',
+      'dagre',
+      'clsx',
+      'tailwind-merge',
+    ],
+  },
+  build: {
+    target: 'esnext',
+    cssCodeSplit: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('@xyflow')) return 'vendor-xyflow';
+            if (id.includes('dagre')) return 'vendor-dagre';
+            if (id.includes('lucide-react')) return 'vendor-icons';
+          }
+        },
+      },
+    },
+  },
   server: {
     port: 3000,
     host: true,
+    strictPort: false,
   },
 });
