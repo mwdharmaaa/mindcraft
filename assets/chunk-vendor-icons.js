@@ -1,4 +1,4 @@
-import{r as o}from"./vendor-xyflow.js";/**
+import{r as o}from"./chunk-vendor-xyflow.js";/**
  * @license lucide-react v0.469.0 - ISC
  *
  * This source code is licensed under the ISC license.
