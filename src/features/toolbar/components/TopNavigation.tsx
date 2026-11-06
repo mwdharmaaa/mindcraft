@@ -3,7 +3,6 @@ import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 import {
   LayoutDirection,
   ConnectorType,
-  CanvasScrollMode,
 } from '@/features/canvas/store/mindMapStore.types';
 import {
   Undo2,
@@ -31,8 +30,6 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
     layoutDirection,
     connectorType,
     setConnectorType,
-    scrollMode,
-    setScrollMode,
   } = useMindMapStore();
 
   return (
@@ -77,23 +74,6 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
               }`}
             >
               {dir === 'LR' ? 'Horizontal' : dir === 'TB' ? 'Top-Down' : 'Radial'}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-1 border-r border-zinc-800 pr-2 mr-1">
-          {(['horizontal', 'vertical', 'free'] as CanvasScrollMode[]).map((mode) => (
-            <button
-              key={mode}
-              onClick={() => setScrollMode(mode)}
-              className={`px-2 py-1 text-xs rounded-lg transition-all ${
-                scrollMode === mode
-                  ? 'bg-zinc-800 text-sky-400 font-semibold'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'
-              }`}
-              title={`Pan axis on wheel scroll: ${mode}`}
-            >
-              {mode === 'horizontal' ? 'Scroll X' : mode === 'vertical' ? 'Scroll Y' : 'Scroll Free'}
             </button>
           ))}
         </div>

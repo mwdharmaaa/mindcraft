@@ -12,7 +12,6 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
   selectedNodeId: null,
   layoutDirection: 'LR',
   connectorType: 'smoothstep',
-  scrollMode: 'horizontal',
   history: [{ nodes: initialNodes, edges: initialEdges }],
   historyIndex: 0,
 
@@ -125,10 +124,6 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
   setConnectorType: (type: ConnectorType) => {
     const nextEdges = get().edges.map((e) => ({ ...e, type }));
     set({ edges: nextEdges, connectorType: type });
-  },
-
-  setScrollMode: (mode) => {
-    set({ scrollMode: mode });
   },
 
   undo: () => {

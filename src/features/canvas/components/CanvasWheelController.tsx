@@ -4,7 +4,7 @@ import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 
 export const CanvasWheelController: React.FC = () => {
   const { getViewport, setViewport } = useReactFlow();
-  const scrollMode = useMindMapStore((s) => s.scrollMode);
+  const layoutDirection = useMindMapStore((s) => s.layoutDirection);
 
   useEffect(() => {
     const container = document.querySelector('.react-flow') as HTMLElement | null;
@@ -22,7 +22,8 @@ export const CanvasWheelController: React.FC = () => {
 
       const viewport = getViewport();
 
-      // Trackpad 2-finger pinch gesture sets ctrlKey = true in modern browsers
+      // 1. ZOOM DETECTION:
+      // Trackpad 2-finger pinch (or Ctrl + mouse wheel) sets e.ctrlKey = true in all modern browsers
       if (e.ctrlKey) {
         const factor = Math.exp(-e.deltaY * 0.008);
         const nextZoom = Math.min(Math.max(viewport.zoom * factor, 0.15), 2.5);
@@ -38,36 +39,34 @@ export const CanvasWheelController: React.FC = () => {
         return;
       }
 
-      // Normal wheel scrolling or 2-finger trackpad pan: slides/pans the canvas without zooming
-      const speed = 1.2;
+      // 2. SCROLL / PAN DETECTION:
+      // Normal wheel scrolling or 2-finger trackpad pan (e.ctrlKey is false)
+      const speed = 1.15;
       let dx = 0;
       let dy = 0;
 
-      if (scrollMode === 'horizontal') {
-        if (e.shiftKey) {
-          // Shift + wheel scrolls vertically
-          dy = -e.deltaY * speed;
-        } else if (Math.abs(e.deltaX) > 0) {
-          // Trackpad 2-finger pan with horizontal delta
-          dx = -e.deltaX * speed;
-          dy = -e.deltaY * speed;
-        } else {
-          // Standard single-axis mouse wheel maps to horizontal slide
-          dx = -e.deltaY * speed;
-        }
-      } else if (scrollMode === 'vertical') {
-        if (e.shiftKey) {
-          dx = -e.deltaY * speed;
-        } else if (Math.abs(e.deltaX) > 0) {
-          dx = -e.deltaX * speed;
-          dy = -e.deltaY * speed;
-        } else {
-          dy = -e.deltaY * speed;
-        }
-      } else {
-        // Free panning mode
+      if (Math.abs(e.deltaX) > 0) {
+        // Trackpad 2-finger pan or horizontal mouse tilt wheel (fluid 2D panning)
         dx = -e.deltaX * speed;
         dy = -e.deltaY * speed;
+      } else {
+        // Single-axis mouse wheel:
+        // Automatically slides along tree expansion axis (horizontal for LR/Radial, vertical for TB)
+        const isHorizontal = layoutDirection !== 'TB';
+
+        if (e.shiftKey) {
+          if (isHorizontal) {
+            dy = -e.deltaY * speed;
+          } else {
+            dx = -e.deltaY * speed;
+          }
+        } else {
+          if (isHorizontal) {
+            dx = -e.deltaY * speed;
+          } else {
+            dy = -e.deltaY * speed;
+          }
+        }
       }
 
       setViewport({
@@ -81,7 +80,7 @@ export const CanvasWheelController: React.FC = () => {
     return () => {
       container.removeEventListener('wheel', handleWheel);
     };
-  }, [getViewport, setViewport, scrollMode]);
+  }, [getViewport, setViewport, layoutDirection]);
 
   return null;
 };
