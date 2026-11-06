@@ -23,7 +23,7 @@ export function buildEdge(
   sourceId: string,
   targetId: string,
   connectorType: ConnectorType,
-  color = '#64748b',
+  color = '#71717a',
   sourcePos?: { x: number; y: number },
   targetPos?: { x: number; y: number }
 ): Edge {
@@ -71,7 +71,7 @@ export function createNewChildNode(
   customPos?: { x: number; y: number }
 ): Node<MindNodeData> {
   const newId = `node-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-  const parentColor = parent.data.color || '#3b82f6';
+  const parentColor = parent.data.color || '#d4d4d8';
 
   return {
     id: newId,
@@ -81,12 +81,14 @@ export function createNewChildNode(
       y: parent.position.y + 40,
     },
     data: {
-      label: kind === 'checklist' ? 'New Checklist' : kind === 'markdown' ? 'New Note' : 'New Topic',
+      label: '',
       kind,
       color: parentColor,
       parentId,
       shape: 'rounded',
       priority: 'none',
+      checklist: [],
+      markdown: '',
     },
   };
 }

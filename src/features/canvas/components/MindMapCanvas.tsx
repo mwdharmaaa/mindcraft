@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -16,7 +16,6 @@ import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 import { nodeTypes } from '@/features/nodes/nodeTypes';
 import { useKeyboardNavigation } from '@/features/canvas/hooks/useKeyboardNavigation';
 import { CanvasWheelController } from './CanvasWheelController';
-import { FloatingCardMenu } from './FloatingCardMenu';
 
 const MindMapCanvasInner: React.FC = () => {
   const {
@@ -30,16 +29,6 @@ const MindMapCanvasInner: React.FC = () => {
   } = useMindMapStore();
 
   const { screenToFlowPosition } = useReactFlow();
-
-  const [menuState, setMenuState] = useState<{
-    isOpen: boolean;
-    screenPos: { x: number; y: number } | null;
-    flowPos: { x: number; y: number } | null;
-  }>({
-    isOpen: false,
-    screenPos: null,
-    flowPos: null,
-  });
 
   useKeyboardNavigation();
 
@@ -66,30 +55,14 @@ const MindMapCanvasInner: React.FC = () => {
       }
 
       const flowPos = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-      setMenuState({
-        isOpen: true,
-        screenPos: { x: e.clientX, y: e.clientY },
-        flowPos,
-      });
+      addCardAtPosition(flowPos, 'topic');
     },
-    [screenToFlowPosition]
+    [screenToFlowPosition, addCardAtPosition]
   );
 
   const handlePaneClick = useCallback(() => {
-    if (menuState.isOpen) {
-      setMenuState((prev) => ({ ...prev, isOpen: false }));
-    }
-  }, [menuState.isOpen]);
-
-  const handleAddCard = useCallback(
-    (kind: 'topic' | 'checklist' | 'markdown') => {
-      if (menuState.flowPos) {
-        addCardAtPosition(menuState.flowPos, kind);
-      }
-      setMenuState((prev) => ({ ...prev, isOpen: false }));
-    },
-    [menuState.flowPos, addCardAtPosition]
-  );
+    setSelectedNodeId(null);
+  }, [setSelectedNodeId]);
 
   return (
     <div
@@ -147,13 +120,6 @@ const MindMapCanvasInner: React.FC = () => {
           className="!bg-zinc-900 !border !border-zinc-700 !rounded-xl !overflow-hidden !shadow-2xl"
         />
       </ReactFlow>
-
-      <FloatingCardMenu
-        isOpen={menuState.isOpen}
-        screenPos={menuState.screenPos}
-        onClose={() => setMenuState((prev) => ({ ...prev, isOpen: false }))}
-        onSelectType={handleAddCard}
-      />
     </div>
   );
 };

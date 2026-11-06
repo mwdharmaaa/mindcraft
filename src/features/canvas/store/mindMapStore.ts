@@ -79,9 +79,18 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
   setSelectedNodeId: (id) => set({ selectedNodeId: id }),
 
   updateNodeData: (id, partialData) => {
-    const nextNodes = get().nodes.map((node) =>
-      node.id === id ? { ...node, data: { ...node.data, ...partialData } } : node
-    );
+    const nextNodes = get().nodes.map((node) => {
+      if (node.id !== id) return node;
+      const nextType = partialData.kind ? partialData.kind : node.type;
+      return {
+        ...node,
+        type: nextType,
+        data: {
+          ...node.data,
+          ...partialData,
+        },
+      };
+    });
     set({ nodes: nextNodes });
   },
 
@@ -165,30 +174,21 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
       ? state.nodes.find((n) => n.id === state.selectedNodeId)
       : null;
 
-    const cardColor = selectedParent?.data.color || (
-      kind === 'checklist' ? '#10b981' :
-      kind === 'markdown' ? '#8b5cf6' :
-      '#3b82f6'
-    );
-
-    const defaultTitle =
-      kind === 'checklist' ? 'Plot Tasks' :
-      kind === 'markdown' ? 'Scene Notes' :
-      'Story Card';
+    const cardColor = selectedParent?.data.color || '#d4d4d8';
 
     const newNode: Node<MindNodeData> = {
       id: newId,
       type: kind,
       position,
       data: {
-        label: defaultTitle,
+        label: '',
         kind,
         color: cardColor,
         parentId: selectedParent?.id,
         shape: 'rounded',
         priority: 'none',
-        ...(kind === 'checklist' ? { checklist: [{ id: '1', text: 'Opening beat', completed: false }] } : {}),
-        ...(kind === 'markdown' ? { markdown: '' } : {}),
+        checklist: [],
+        markdown: '',
       },
     };
 
@@ -198,7 +198,7 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
         selectedParent.id,
         newId,
         state.connectorType,
-        cardColor,
+        '#71717a',
         selectedParent.position,
         position
       );

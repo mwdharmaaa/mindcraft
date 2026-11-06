@@ -1,20 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NodeProps, Position } from '@xyflow/react';
 import { MindNodeType } from '@/features/nodes/types/node.types';
 import { NodeHandle } from './NodeHandle';
+import { NodeEditToolbar } from './NodeEditToolbar';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 import { ChevronRight, Plus } from 'lucide-react';
 
 export const TopicNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selected }) => {
   const { updateNodeData, addChildNode, toggleCollapse, edges } = useMindMapStore();
   const [isEditing, setIsEditing] = useState(false);
-  const [label, setLabel] = useState(data.label);
+  const [label, setLabel] = useState(data.label || '');
+
+  useEffect(() => {
+    setLabel(data.label || '');
+  }, [data.label]);
 
   const hasChildren = edges.some((e) => e.source === id);
 
   const handleBlur = () => {
     setIsEditing(false);
-    updateNodeData(id, { label: label.trim() || 'Untitled' });
+    updateNodeData(id, { label: label.trim() });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -36,10 +41,17 @@ export const TopicNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selecte
           : 'border-zinc-700 hover:border-zinc-500'
       }`}
       style={{
-        borderLeftColor: data.color || '#e4e4e7',
+        borderLeftColor: data.color || '#d4d4d8',
         borderLeftWidth: '3px',
       }}
     >
+      <NodeEditToolbar
+        nodeId={id}
+        isVisible={!!selected}
+        currentKind="topic"
+        currentShape={data.shape}
+      />
+
       <NodeHandle type="target" position={Position.Left} id="target-l" />
       <NodeHandle type="source" position={Position.Left} id="source-l" />
       <NodeHandle type="target" position={Position.Right} id="target-r" />
@@ -71,11 +83,12 @@ export const TopicNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selecte
           <input
             type="text"
             value={label}
+            placeholder="Type note title..."
             onChange={(e) => setLabel(e.target.value)}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             autoFocus
-            className="bg-zinc-800 text-zinc-100 text-xs px-1.5 py-0.5 rounded outline-none border border-zinc-400 min-w-[120px]"
+            className="bg-zinc-800 text-zinc-100 text-xs px-1.5 py-0.5 rounded outline-none border border-zinc-400 min-w-[120px] placeholder:text-zinc-500"
           />
         ) : (
           <span
@@ -83,9 +96,11 @@ export const TopicNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selecte
               e.stopPropagation();
               setIsEditing(true);
             }}
-            className="text-xs font-medium text-zinc-200 select-text cursor-text"
+            className={`text-xs select-text cursor-text ${
+              data.label ? 'font-medium text-zinc-200' : 'italic text-zinc-500'
+            }`}
           >
-            {data.label}
+            {data.label || 'Empty card - double click to type'}
           </span>
         )}
 
@@ -93,9 +108,9 @@ export const TopicNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selecte
           <span
             className={`text-[10px] uppercase font-mono px-1.5 py-0.5 rounded ${
               data.priority === 'urgent'
-                ? 'bg-red-500/10 text-red-400 border border-red-500/20'
+                ? 'bg-zinc-100 text-zinc-950 font-bold border border-zinc-200'
                 : data.priority === 'high'
-                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                ? 'bg-zinc-700 text-zinc-100 border border-zinc-600'
                 : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
             }`}
           >
@@ -111,7 +126,7 @@ export const TopicNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selecte
           className="opacity-0 group-hover:opacity-100 transition-opacity ml-1 w-4 h-4 rounded flex items-center justify-center text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
           title="Add child card"
         >
-          <Plus className="w-3 h-3" />
+          <Plus className="w-3 h-3 text-zinc-300" />
         </button>
       </div>
     </div>
