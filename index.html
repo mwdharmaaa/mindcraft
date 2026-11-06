@@ -25,43 +25,20 @@
         background-size: 20px 20px;
         position: relative;
       }
-      #direct-file-banner {
-        display: none;
-        position: fixed;
-        bottom: 24px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #18181b;
-        border: 1px solid #3f3f46;
-        padding: 14px 20px;
-        border-radius: 12px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-        font-size: 13px;
-        color: #f4f4f5;
-        z-index: 9999;
-        text-align: center;
-      }
-      #direct-file-banner code {
-        background: #27272a;
-        color: #38bdf8;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-family: monospace;
-      }
     </style>
+    <link rel="stylesheet" href="./assets/style.css" />
   </head>
   <body class="bg-[#09090b] text-[#f4f4f5] antialiased overflow-hidden select-none">
     <div id="root">
       <div class="instant-canvas-skeleton"></div>
-      <div id="direct-file-banner">
-        Canvas requires local HTTP server. Run <code>npm run dev</code> or double-click <code>run.bat</code>.
-      </div>
     </div>
-    <script>
-      if (window.location.protocol === 'file:') {
-        document.getElementById('direct-file-banner').style.display = 'block';
+    <script type="module">
+      const isDev = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '3000';
+      if (isDev) {
+        import('/src/main.tsx');
+      } else {
+        import('./assets/index.js');
       }
     </script>
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
