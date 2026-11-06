@@ -32,12 +32,11 @@
     <div id="root">
       <div class="instant-canvas-skeleton"></div>
     </div>
+    <script type="module" src="/src/main.tsx"></script>
     <script type="module">
-      const isDev = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '3000';
-      if (isDev) {
-        import('/src/main.tsx');
-      } else {
-        import('./assets/index.js');
+      if (window.location.protocol === 'file:' || window.location.hostname.endsWith('github.io')) {
+        const prod = './assets/index.js';
+        import(/* @vite-ignore */ prod);
       }
     </script>
   </body>
