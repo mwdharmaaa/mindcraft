@@ -3,6 +3,7 @@ import { MindNodeData } from '@/features/nodes/types/node.types';
 
 export type LayoutDirection = 'LR' | 'TB' | 'RADIAL';
 export type ConnectorType = 'bezier' | 'straight' | 'smoothstep';
+export type CanvasScrollMode = 'horizontal' | 'vertical' | 'free';
 
 export interface MindMapHistoryItem {
   nodes: Node<MindNodeData>[];
@@ -15,6 +16,7 @@ export interface MindMapStoreState {
   selectedNodeId: string | null;
   layoutDirection: LayoutDirection;
   connectorType: ConnectorType;
+  scrollMode: CanvasScrollMode;
   history: MindMapHistoryItem[];
   historyIndex: number;
 
@@ -30,6 +32,7 @@ export interface MindMapStoreState {
   toggleCollapse: (nodeId: string) => void;
   applyLayout: (direction?: LayoutDirection) => void;
   setConnectorType: (type: ConnectorType) => void;
+  setScrollMode: (mode: CanvasScrollMode) => void;
   undo: () => void;
   redo: () => void;
   resetCanvas: () => void;

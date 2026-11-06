@@ -7,6 +7,7 @@ import {
   BackgroundVariant,
   SelectionMode,
   OnSelectionChangeParams,
+  PanOnScrollMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
@@ -17,6 +18,7 @@ export const MindMapCanvas: React.FC = () => {
   const {
     nodes,
     edges,
+    scrollMode,
     onNodesChange,
     onEdgesChange,
     onConnect,
@@ -36,6 +38,13 @@ export const MindMapCanvas: React.FC = () => {
     [setSelectedNodeId]
   );
 
+  const activePanMode =
+    scrollMode === 'horizontal'
+      ? PanOnScrollMode.Horizontal
+      : scrollMode === 'vertical'
+      ? PanOnScrollMode.Vertical
+      : PanOnScrollMode.Free;
+
   return (
     <div className="w-full h-full relative bg-[#09090b]">
       <ReactFlow
@@ -47,6 +56,13 @@ export const MindMapCanvas: React.FC = () => {
         onConnect={onConnect}
         onSelectionChange={handleSelectionChange}
         selectionMode={SelectionMode.Partial}
+        panOnScroll={true}
+        panOnScrollMode={activePanMode}
+        panOnScrollSpeed={1.4}
+        zoomOnScroll={false}
+        zoomOnPinch={true}
+        zoomActivationKeyCode="Control"
+        panOnDrag={[1, 2]}
         fitView
         minZoom={0.15}
         maxZoom={2.5}

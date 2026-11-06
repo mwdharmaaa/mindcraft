@@ -13,8 +13,10 @@ const SHORTCUTS = [
   { key: 'Ctrl + Z', desc: 'Undo last action' },
   { key: 'Ctrl + Y / Shift+Z', desc: 'Redo last action' },
   { key: 'Double Click', desc: 'Edit title inline' },
-  { key: 'Space + Drag', desc: 'Pan infinite canvas' },
-  { key: 'Scroll Wheel', desc: 'Zoom in / out' },
+  { key: 'Scroll Wheel', desc: 'Pan canvas horizontally / vertically' },
+  { key: 'Ctrl + Scroll', desc: 'Zoom canvas in / out' },
+  { key: 'Shift + Scroll', desc: 'Invert pan axis' },
+  { key: 'Space + Drag', desc: 'Freeform pan canvas' },
 ];
 
 export const ShortcutsDialog: React.FC<ShortcutsDialogProps> = ({ isOpen, onClose }) => {
