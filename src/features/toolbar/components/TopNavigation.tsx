@@ -91,7 +91,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
 
         <button
           onClick={resetCanvas}
-          className="p-1.5 rounded-lg text-zinc-400 hover:text-red-400 hover:bg-zinc-800 transition-colors"
+          className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
           title="Reset canvas template"
         >
           <RotateCcw className="w-4 h-4" />

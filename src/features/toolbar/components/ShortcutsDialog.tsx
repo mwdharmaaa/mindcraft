@@ -7,9 +7,10 @@ interface ShortcutsDialogProps {
 }
 
 const SHORTCUTS = [
-  { key: 'Double Click Canvas', desc: 'Open quick Add Card menu' },
+  { key: 'Double Click Canvas', desc: 'Create new empty card' },
+  { key: 'Click Card', desc: 'Open contextual edit navigation' },
   { key: 'Double Click Card', desc: 'Edit title inline' },
-  { key: 'Tab', desc: 'Add connected card to selected' },
+  { key: 'Tab', desc: 'Add connected child card' },
   { key: 'Enter', desc: 'Add sibling card' },
   { key: 'Del / Backspace', desc: 'Delete card and descendants' },
   { key: 'Scroll Wheel', desc: 'Slide canvas up / down' },
@@ -28,7 +29,7 @@ export const ShortcutsDialog: React.FC<ShortcutsDialogProps> = ({ isOpen, onClos
       <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
           <div className="flex items-center gap-2">
-            <Command className="w-4 h-4 text-blue-400" />
+            <Command className="w-4 h-4 text-zinc-200" />
             <h3 className="text-sm font-semibold text-zinc-100">Keyboard Shortcuts</h3>
           </div>
           <button onClick={onClose} className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800">

@@ -8,13 +8,15 @@ import {
 import { Trash2, Plus, GitBranch, Layers } from 'lucide-react';
 
 const COLOR_PALETTE = [
-  '#f4f4f5', // bright white-zinc
-  '#d4d4d8', // light gray
-  '#a1a1aa', // medium light gray
-  '#71717a', // slate gray
-  '#38bdf8', // sky accent
-  '#34d399', // mint accent
-  '#a78bfa', // lavender accent
+  '#ffffff', // crisp white
+  '#f4f4f5', // zinc 100
+  '#e4e4e7', // zinc 200
+  '#d4d4d8', // zinc 300
+  '#a1a1aa', // zinc 400
+  '#71717a', // zinc 500
+  '#52525b', // zinc 600
+  '#3f3f46', // zinc 700
+  '#27272a', // zinc 800
 ];
 
 export const NodeCustomizerPanel: React.FC = () => {
@@ -45,7 +47,7 @@ export const NodeCustomizerPanel: React.FC = () => {
         {!isRoot && (
           <button
             onClick={() => deleteSubtree(selectedNode.id)}
-            className="p-1 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-zinc-800 transition-colors"
+            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
             title="Delete card & branch"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -55,15 +57,15 @@ export const NodeCustomizerPanel: React.FC = () => {
 
       <div className="space-y-1.5">
         <label className="text-[11px] font-medium text-zinc-400">Accent Border</label>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {COLOR_PALETTE.map((hex) => (
             <button
               key={hex}
               onClick={() => updateNodeData(selectedNode.id, { color: hex })}
-              className={`w-5 h-5 rounded-full border-2 transition-transform ${
+              className={`w-5 h-5 rounded-full border transition-transform ${
                 data.color === hex
                   ? 'scale-125 border-white shadow-sm ring-2 ring-zinc-500/40'
-                  : 'border-zinc-800 hover:scale-110'
+                  : 'border-zinc-700 hover:scale-110'
               }`}
               style={{ backgroundColor: hex }}
             />
@@ -75,7 +77,7 @@ export const NodeCustomizerPanel: React.FC = () => {
         <>
           <div className="space-y-1.5">
             <label className="text-[11px] font-medium text-zinc-400">Card Type</label>
-            <div className="grid grid-cols-3 gap-1 bg-zinc-800/80 p-1 rounded-lg border border-zinc-750">
+            <div className="grid grid-cols-3 gap-1 bg-zinc-800/80 p-1 rounded-lg border border-zinc-700">
               {(['topic', 'checklist', 'markdown'] as NodeTypeKind[]).map((kind) => (
                 <button
                   key={kind}
@@ -94,7 +96,7 @@ export const NodeCustomizerPanel: React.FC = () => {
 
           <div className="space-y-1.5">
             <label className="text-[11px] font-medium text-zinc-400">Shape</label>
-            <div className="grid grid-cols-3 gap-1 bg-zinc-800/80 p-1 rounded-lg border border-zinc-750">
+            <div className="grid grid-cols-3 gap-1 bg-zinc-800/80 p-1 rounded-lg border border-zinc-700">
               {(['rounded', 'pill', 'rectangle'] as NodeShape[]).map((shape) => (
                 <button
                   key={shape}
@@ -120,7 +122,7 @@ export const NodeCustomizerPanel: React.FC = () => {
                   onClick={() => updateNodeData(selectedNode.id, { priority: p })}
                   className={`px-2 py-0.5 text-[10px] uppercase font-mono rounded transition-colors ${
                     (data.priority || 'none') === p
-                      ? 'bg-zinc-200 text-zinc-900 font-bold shadow-sm'
+                      ? 'bg-zinc-200 text-zinc-950 font-bold shadow-sm'
                       : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700/60'
                   }`}
                 >

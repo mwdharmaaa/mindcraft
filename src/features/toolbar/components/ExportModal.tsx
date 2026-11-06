@@ -75,7 +75,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
               key={t}
               onClick={() => setTab(t)}
               className={`pb-2.5 px-2 border-b-2 font-medium capitalize transition-colors ${
-                tab === t ? 'border-blue-500 text-blue-400' : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                tab === t ? 'border-zinc-200 text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-200'
               }`}
             >
               {t}
@@ -91,12 +91,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
                 onChange={(e) => setImportText(e.target.value)}
                 placeholder="Paste valid MindCraft JSON schema..."
                 rows={8}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-xs text-zinc-200 font-mono outline-none focus:border-blue-500"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-xs text-zinc-200 font-mono outline-none focus:border-zinc-400"
               />
-              {importError && <p className="text-xs text-red-400 font-mono">{importError}</p>}
+              {importError && <p className="text-xs text-zinc-400 font-mono">{importError}</p>}
               <button
                 onClick={handleImport}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold"
+                className="flex items-center gap-2 px-4 py-2 bg-zinc-200 hover:bg-white text-zinc-950 rounded-lg text-xs font-semibold transition-colors"
               >
                 <Upload className="w-4 h-4" />
                 <span>Load Data</span>
@@ -110,16 +110,16 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium border border-zinc-750 transition-colors"
                 >
-                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? <Check className="w-3.5 h-3.5 text-zinc-200" /> : <Copy className="w-3.5 h-3.5 text-zinc-400" />}
                   <span>{copied ? 'Copied' : 'Copy'}</span>
                 </button>
                 <button
                   onClick={handleExportPng}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-600/30 text-xs font-medium"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-xs font-medium transition-colors"
                 >
-                  <Download className="w-3.5 h-3.5" />
+                  <Download className="w-3.5 h-3.5 text-zinc-400" />
                   <span>Download PNG</span>
                 </button>
               </div>
