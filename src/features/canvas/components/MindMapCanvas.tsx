@@ -7,6 +7,7 @@ import {
   BackgroundVariant,
   SelectionMode,
   OnSelectionChangeParams,
+  ConnectionMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
@@ -48,6 +49,7 @@ export const MindMapCanvas: React.FC = () => {
         onConnect={onConnect}
         onSelectionChange={handleSelectionChange}
         selectionMode={SelectionMode.Partial}
+        connectionMode={ConnectionMode.Loose}
         panOnScroll={false}
         zoomOnScroll={false}
         zoomOnPinch={true}

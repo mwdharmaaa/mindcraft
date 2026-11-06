@@ -43,8 +43,12 @@ export const ChecklistNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, sel
       style={{ borderLeftColor: data.color || '#10b981', borderLeftWidth: '3px' }}
     >
       <NodeHandle type="target" position={Position.Left} id="target-l" />
-      <NodeHandle type="target" position={Position.Top} id="target-t" />
+      <NodeHandle type="source" position={Position.Left} id="source-l" />
+      <NodeHandle type="target" position={Position.Right} id="target-r" />
       <NodeHandle type="source" position={Position.Right} id="source-r" />
+      <NodeHandle type="target" position={Position.Top} id="target-t" />
+      <NodeHandle type="source" position={Position.Top} id="source-t" />
+      <NodeHandle type="target" position={Position.Bottom} id="target-b" />
       <NodeHandle type="source" position={Position.Bottom} id="source-b" />
 
       <div className="flex items-center justify-between mb-2">

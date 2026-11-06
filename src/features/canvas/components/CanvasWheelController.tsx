@@ -1,17 +1,15 @@
 import React, { useEffect } from 'react';
 import { useReactFlow } from '@xyflow/react';
-import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 
 export const CanvasWheelController: React.FC = () => {
   const { getViewport, setViewport } = useReactFlow();
-  const layoutDirection = useMindMapStore((s) => s.layoutDirection);
 
   useEffect(() => {
     const container = document.querySelector('.react-flow') as HTMLElement | null;
     if (!container) return;
 
     const handleWheel = (e: WheelEvent) => {
-      // Allow form inputs and dropdowns to scroll normally
+      // Don't intercept scroll inside input, textarea, select, or modals
       const target = e.target as HTMLElement | null;
       if (target?.closest('input, textarea, select, [data-no-wheel]')) {
         return;
@@ -46,26 +44,17 @@ export const CanvasWheelController: React.FC = () => {
       let dy = 0;
 
       if (Math.abs(e.deltaX) > 0) {
-        // Trackpad 2-finger pan or horizontal mouse tilt wheel (fluid 2D panning)
+        // Trackpad 2-finger gesture or horizontal mouse tilt wheel (fluid 2D pan)
         dx = -e.deltaX * speed;
         dy = -e.deltaY * speed;
       } else {
         // Single-axis mouse wheel:
-        // Automatically slides along tree expansion axis (horizontal for LR/Radial, vertical for TB)
-        const isHorizontal = layoutDirection !== 'TB';
-
         if (e.shiftKey) {
-          if (isHorizontal) {
-            dy = -e.deltaY * speed;
-          } else {
-            dx = -e.deltaY * speed;
-          }
+          // Shift + Wheel slides vertically
+          dy = -e.deltaY * speed;
         } else {
-          if (isHorizontal) {
-            dx = -e.deltaY * speed;
-          } else {
-            dy = -e.deltaY * speed;
-          }
+          // Default Wheel slides horizontally across freeform mind map canvas
+          dx = -e.deltaY * speed;
         }
       }
 
@@ -80,7 +69,7 @@ export const CanvasWheelController: React.FC = () => {
     return () => {
       container.removeEventListener('wheel', handleWheel);
     };
-  }, [getViewport, setViewport, layoutDirection]);
+  }, [getViewport, setViewport]);
 
   return null;
 };

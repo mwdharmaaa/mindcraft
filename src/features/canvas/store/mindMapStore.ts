@@ -6,9 +6,54 @@ import { getAllDescendantIds, buildEdge, createNewChildNode } from './treeHelper
 import { runMindMapLayout } from '@/features/layout/layoutEngine';
 import { MindNodeData } from '@/features/nodes/types/node.types';
 
+function optimizeEdgeHandles(nodes: Node<MindNodeData>[], edges: Edge[]): Edge[] {
+  const nodeMap = new Map<string, { x: number; y: number }>();
+  nodes.forEach((n) => nodeMap.set(n.id, n.position));
+
+  return edges.map((edge) => {
+    const sPos = nodeMap.get(edge.source);
+    const tPos = nodeMap.get(edge.target);
+    if (!sPos || !tPos) return edge;
+
+    const dx = tPos.x - sPos.x;
+    const dy = tPos.y - sPos.y;
+
+    let sourceHandle = 'source-r';
+    let targetHandle = 'target-l';
+
+    if (Math.abs(dx) >= Math.abs(dy)) {
+      if (dx < 0) {
+        sourceHandle = 'source-l';
+        targetHandle = 'target-r';
+      } else {
+        sourceHandle = 'source-r';
+        targetHandle = 'target-l';
+      }
+    } else {
+      if (dy < 0) {
+        sourceHandle = 'source-t';
+        targetHandle = 'target-b';
+      } else {
+        sourceHandle = 'source-b';
+        targetHandle = 'target-t';
+      }
+    }
+
+    if (edge.sourceHandle === sourceHandle && edge.targetHandle === targetHandle) {
+      return edge;
+    }
+
+    return {
+      ...edge,
+      sourceHandle,
+      targetHandle,
+    };
+  });
+}
+
 export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
   nodes: initialNodes,
-  edges: initialEdges,
+  edges: optimizeEdgeHandles(initialNodes, initialEdges),
   selectedNodeId: null,
   layoutDirection: 'LR',
   connectorType: 'smoothstep',
@@ -16,7 +61,10 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
   historyIndex: 0,
 
   onNodesChange: (changes) => {
-    set({ nodes: applyNodeChanges(changes, get().nodes) });
+    const nextNodes = applyNodeChanges(changes, get().nodes);
+    const hasPositionChange = changes.some((c) => c.type === 'position');
+    const nextEdges = hasPositionChange ? optimizeEdgeHandles(nextNodes, get().edges) : get().edges;
+    set({ nodes: nextNodes, edges: nextEdges });
   },
 
   onEdgesChange: (changes) => {
@@ -24,7 +72,7 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
   },
 
   onConnect: (connection) => {
-    const nextEdges = addEdge(connection, get().edges);
+    const nextEdges = optimizeEdgeHandles(get().nodes, addEdge(connection, get().edges));
     set({ edges: nextEdges });
   },
 
@@ -45,18 +93,32 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
     const parent = state.nodes.find((n) => n.id === pid);
     if (!parent) return;
 
-    const newNode = createNewChildNode(pid, parent, 'topic');
-    const newEdge = buildEdge(pid, newNode.id, state.connectorType, parent.data.color);
+    // Organic offset placement: freely places child near parent without touching any existing nodes
+    const existingChildren = state.edges.filter((e) => e.source === pid);
+    const count = existingChildren.length;
+
+    // Fan-out offset (staggers children neatly in open space)
+    const offsetX = 250;
+    const offsetY = count === 0 ? 0 : count % 2 === 1 ? Math.ceil(count / 2) * 80 : -Math.ceil(count / 2) * 80;
+    const targetPos = {
+      x: parent.position.x + offsetX,
+      y: parent.position.y + offsetY,
+    };
+
+    const newNode = createNewChildNode(pid, parent, 'topic', targetPos);
+    const rawEdge = buildEdge(pid, newNode.id, state.connectorType, parent.data.color, parent.position, targetPos);
 
     const nextNodes = [...state.nodes, newNode];
-    const nextEdges = [...state.edges, newEdge];
-    const layoutResult = runMindMapLayout(nextNodes, nextEdges, state.layoutDirection);
+    const nextEdges = optimizeEdgeHandles(nextNodes, [...state.edges, rawEdge]);
 
     set({
-      nodes: layoutResult.nodes,
-      edges: layoutResult.edges,
+      nodes: nextNodes,
+      edges: nextEdges,
       selectedNodeId: newNode.id,
-      history: [...state.history.slice(0, state.historyIndex + 1), { nodes: layoutResult.nodes, edges: layoutResult.edges }],
+      history: [
+        ...state.history.slice(0, state.historyIndex + 1),
+        { nodes: nextNodes, edges: nextEdges },
+      ],
       historyIndex: state.historyIndex + 1,
     });
   },
@@ -69,7 +131,31 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
     const targetNode = state.nodes.find((n) => n.id === targetId);
     if (!targetNode || !targetNode.data.parentId) return;
 
-    state.addChildNode(targetNode.data.parentId);
+    const parent = state.nodes.find((n) => n.id === targetNode.data.parentId);
+    if (!parent) return;
+
+    // Place sibling directly below current target node
+    const targetPos = {
+      x: targetNode.position.x,
+      y: targetNode.position.y + 80,
+    };
+
+    const newNode = createNewChildNode(parent.id, parent, 'topic', targetPos);
+    const rawEdge = buildEdge(parent.id, newNode.id, state.connectorType, parent.data.color, parent.position, targetPos);
+
+    const nextNodes = [...state.nodes, newNode];
+    const nextEdges = optimizeEdgeHandles(nextNodes, [...state.edges, rawEdge]);
+
+    set({
+      nodes: nextNodes,
+      edges: nextEdges,
+      selectedNodeId: newNode.id,
+      history: [
+        ...state.history.slice(0, state.historyIndex + 1),
+        { nodes: nextNodes, edges: nextEdges },
+      ],
+      historyIndex: state.historyIndex + 1,
+    });
   },
 
   deleteSubtree: (nodeId) => {
@@ -87,7 +173,10 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
       nodes: nextNodes,
       edges: nextEdges,
       selectedNodeId: null,
-      history: [...state.history.slice(0, state.historyIndex + 1), { nodes: nextNodes, edges: nextEdges }],
+      history: [
+        ...state.history.slice(0, state.historyIndex + 1),
+        { nodes: nextNodes, edges: nextEdges },
+      ],
       historyIndex: state.historyIndex + 1,
     });
   },
@@ -116,9 +205,19 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
 
   applyLayout: (direction) => {
     const state = get();
-    const dir = direction || state.layoutDirection;
-    const result = runMindMapLayout(state.nodes, state.edges, dir);
-    set({ nodes: result.nodes, edges: result.edges, layoutDirection: dir });
+    const nextDir = direction || state.layoutDirection;
+    const layoutResult = runMindMapLayout(state.nodes, state.edges, nextDir);
+
+    set({
+      nodes: layoutResult.nodes,
+      edges: layoutResult.edges,
+      layoutDirection: nextDir,
+      history: [
+        ...state.history.slice(0, state.historyIndex + 1),
+        { nodes: layoutResult.nodes, edges: layoutResult.edges },
+      ],
+      historyIndex: state.historyIndex + 1,
+    });
   },
 
   setConnectorType: (type: ConnectorType) => {
@@ -152,7 +251,7 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
     });
   },
 
-  importMindMap: (nodes: Node<MindNodeData>[], edges: Edge[]) => {
+  importMindMap: (nodes, edges) => {
     set({
       nodes,
       edges,

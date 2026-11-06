@@ -1,9 +1,6 @@
 import React from 'react';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
-import {
-  LayoutDirection,
-  ConnectorType,
-} from '@/features/canvas/store/mindMapStore.types';
+import { ConnectorType } from '@/features/canvas/store/mindMapStore.types';
 import {
   Undo2,
   Redo2,
@@ -26,8 +23,6 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
     undo,
     redo,
     resetCanvas,
-    applyLayout,
-    layoutDirection,
     connectorType,
     setConnectorType,
   } = useMindMapStore();
@@ -60,22 +55,6 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
           >
             <Redo2 className="w-4 h-4" />
           </button>
-        </div>
-
-        <div className="flex items-center gap-1 border-r border-zinc-800 pr-2 mr-1">
-          {(['LR', 'TB', 'RADIAL'] as LayoutDirection[]).map((dir) => (
-            <button
-              key={dir}
-              onClick={() => applyLayout(dir)}
-              className={`px-2.5 py-1 text-xs rounded-lg transition-all ${
-                layoutDirection === dir
-                  ? 'bg-zinc-800 text-blue-400 font-semibold'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'
-              }`}
-            >
-              {dir === 'LR' ? 'Horizontal' : dir === 'TB' ? 'Top-Down' : 'Radial'}
-            </button>
-          ))}
         </div>
 
         <div className="flex items-center gap-1 border-r border-zinc-800 pr-2 mr-1">

@@ -23,12 +23,42 @@ export function buildEdge(
   sourceId: string,
   targetId: string,
   connectorType: ConnectorType,
-  color = '#64748b'
+  color = '#64748b',
+  sourcePos?: { x: number; y: number },
+  targetPos?: { x: number; y: number }
 ): Edge {
+  let sourceHandle = 'source-r';
+  let targetHandle = 'target-l';
+
+  if (sourcePos && targetPos) {
+    const dx = targetPos.x - sourcePos.x;
+    const dy = targetPos.y - sourcePos.y;
+
+    if (Math.abs(dx) >= Math.abs(dy)) {
+      if (dx < 0) {
+        sourceHandle = 'source-l';
+        targetHandle = 'target-r';
+      } else {
+        sourceHandle = 'source-r';
+        targetHandle = 'target-l';
+      }
+    } else {
+      if (dy < 0) {
+        sourceHandle = 'source-t';
+        targetHandle = 'target-b';
+      } else {
+        sourceHandle = 'source-b';
+        targetHandle = 'target-t';
+      }
+    }
+  }
+
   return {
     id: `e-${sourceId}-${targetId}-${Date.now()}`,
     source: sourceId,
     target: targetId,
+    sourceHandle,
+    targetHandle,
     type: connectorType,
     style: { stroke: color, strokeWidth: 1.5 },
   };
@@ -37,7 +67,8 @@ export function buildEdge(
 export function createNewChildNode(
   parentId: string,
   parent: Node<MindNodeData>,
-  kind: 'topic' | 'checklist' | 'markdown' = 'topic'
+  kind: 'topic' | 'checklist' | 'markdown' = 'topic',
+  customPos?: { x: number; y: number }
 ): Node<MindNodeData> {
   const newId = `node-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   const parentColor = parent.data.color || '#3b82f6';
@@ -45,9 +76,9 @@ export function createNewChildNode(
   return {
     id: newId,
     type: kind,
-    position: {
-      x: parent.position.x + 280,
-      y: parent.position.y + (Math.random() * 80 - 40),
+    position: customPos || {
+      x: parent.position.x + 240,
+      y: parent.position.y + 40,
     },
     data: {
       label: kind === 'checklist' ? 'New Checklist' : kind === 'markdown' ? 'New Note' : 'New Topic',
