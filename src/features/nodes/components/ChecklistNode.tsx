@@ -38,9 +38,9 @@ export const ChecklistNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, sel
   return (
     <div
       className={`relative group w-64 bg-zinc-900 border rounded-xl p-3 shadow-lg transition-all ${
-        selected ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-zinc-800 hover:border-zinc-700'
+        selected ? 'border-zinc-200 ring-2 ring-zinc-400/25 shadow-zinc-950/70' : 'border-zinc-700 hover:border-zinc-500'
       }`}
-      style={{ borderLeftColor: data.color || '#10b981', borderLeftWidth: '3px' }}
+      style={{ borderLeftColor: data.color || '#e4e4e7', borderLeftWidth: '3px' }}
     >
       <NodeHandle type="target" position={Position.Left} id="target-l" />
       <NodeHandle type="source" position={Position.Left} id="source-l" />
@@ -53,7 +53,7 @@ export const ChecklistNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, sel
 
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-200">
-          <CheckSquare className="w-3.5 h-3.5 text-emerald-400" />
+          <CheckSquare className="w-3.5 h-3.5 text-zinc-300" />
           <span>{data.label}</span>
         </div>
         <span className="text-[10px] font-mono text-zinc-400">
@@ -63,7 +63,7 @@ export const ChecklistNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, sel
 
       <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden mb-2.5">
         <div
-          className="h-full bg-emerald-500 transition-all duration-300 rounded-full"
+          className="h-full bg-zinc-300 transition-all duration-300 rounded-full"
           style={{ width: `${progressPercent}%` }}
         />
       </div>

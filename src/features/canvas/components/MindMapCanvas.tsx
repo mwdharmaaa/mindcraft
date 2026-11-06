@@ -118,7 +118,7 @@ const MindMapCanvasInner: React.FC = () => {
         maxZoom={2.5}
         defaultEdgeOptions={{
           type: 'smoothstep',
-          style: { stroke: '#475569', strokeWidth: 1.5 },
+          style: { stroke: '#71717a', strokeWidth: 1.5 },
         }}
         proOptions={{ hideAttribution: true }}
         className="touch-none"
@@ -129,22 +129,22 @@ const MindMapCanvasInner: React.FC = () => {
           variant={BackgroundVariant.Dots}
           gap={20}
           size={1.5}
-          color="rgba(255, 255, 255, 0.08)"
+          color="rgba(244, 244, 245, 0.12)"
         />
 
         <Controls
           showInteractive={false}
-          className="!bg-zinc-900 !border !border-zinc-800 !rounded-xl !overflow-hidden !shadow-xl [&>button]:!bg-zinc-900 [&>button]:!border-zinc-800 [&>button]:!text-zinc-300 hover:[&>button]:!bg-zinc-800"
+          className="!bg-zinc-900/95 !border !border-zinc-700 !rounded-xl !overflow-hidden !shadow-2xl [&>button]:!bg-zinc-900 [&>button]:!border-zinc-700 [&>button]:!text-zinc-200 hover:[&>button]:!bg-zinc-800"
         />
 
         <MiniMap
           nodeStrokeWidth={3}
           nodeColor={(node) => {
             const dataColor = (node.data as { color?: string })?.color;
-            return dataColor || '#3b82f6';
+            return dataColor || '#e4e4e7';
           }}
-          maskColor="rgba(9, 9, 11, 0.85)"
-          className="!bg-zinc-900 !border !border-zinc-800 !rounded-xl !overflow-hidden !shadow-xl"
+          maskColor="rgba(9, 9, 11, 0.88)"
+          className="!bg-zinc-900 !border !border-zinc-700 !rounded-xl !overflow-hidden !shadow-2xl"
         />
       </ReactFlow>
 

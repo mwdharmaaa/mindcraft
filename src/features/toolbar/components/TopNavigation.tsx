@@ -29,17 +29,17 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
 
   return (
     <header className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-none">
-      <div className="flex items-center gap-3 bg-zinc-900/90 backdrop-blur-md border border-zinc-800 rounded-xl px-4 py-2 pointer-events-auto shadow-xl">
-        <div className="w-6 h-6 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+      <div className="flex items-center gap-3 bg-zinc-900/95 backdrop-blur-md border border-zinc-700/80 rounded-xl px-4 py-2 pointer-events-auto shadow-xl">
+        <div className="w-6 h-6 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-200">
           <Network className="w-3.5 h-3.5" />
         </div>
         <div className="flex items-baseline gap-2">
           <span className="font-bold text-sm tracking-tight text-zinc-100">MindCraft</span>
-          <span className="text-[10px] font-mono uppercase text-zinc-500">v0.1</span>
+          <span className="text-[10px] font-mono uppercase text-zinc-400">Story Studio</span>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 bg-zinc-900/90 backdrop-blur-md border border-zinc-800 rounded-xl p-1 pointer-events-auto shadow-xl">
+      <div className="flex items-center gap-2 bg-zinc-900/95 backdrop-blur-md border border-zinc-700/80 rounded-xl p-1 pointer-events-auto shadow-xl">
         <div className="flex items-center gap-1 border-r border-zinc-800 pr-2 mr-1">
           <button
             onClick={undo}
@@ -64,7 +64,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
               onClick={() => setConnectorType(conn)}
               className={`px-2.5 py-1 text-xs rounded-lg capitalize transition-all ${
                 connectorType === conn
-                  ? 'bg-zinc-800 text-emerald-400 font-semibold'
+                  ? 'bg-zinc-800 text-zinc-100 border border-zinc-600 font-semibold'
                   : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'
               }`}
             >
@@ -75,7 +75,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
 
         <button
           onClick={onOpenExport}
-          className="flex items-center gap-1.5 px-3 py-1 text-xs rounded-lg text-zinc-200 hover:text-white bg-blue-600 hover:bg-blue-500 font-medium transition-colors shadow-sm"
+          className="flex items-center gap-1.5 px-3 py-1 text-xs rounded-lg text-zinc-100 hover:text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-500 font-medium transition-all shadow-sm"
         >
           <Share2 className="w-3.5 h-3.5" />
           <span>Export</span>

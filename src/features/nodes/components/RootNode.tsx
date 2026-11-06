@@ -23,11 +23,11 @@ export const RootNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selected
     <div
       className={`relative group px-5 py-3.5 rounded-xl bg-zinc-900 border transition-all duration-200 shadow-xl ${
         selected
-          ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-blue-500/10'
-          : 'border-zinc-700/80 hover:border-zinc-500'
+          ? 'border-zinc-200 ring-2 ring-zinc-400/25 shadow-zinc-950/80'
+          : 'border-zinc-700 hover:border-zinc-500'
       }`}
       style={{
-        borderLeftColor: data.color || '#3b82f6',
+        borderLeftColor: data.color || '#f4f4f5',
         borderLeftWidth: '4px',
       }}
     >
@@ -41,7 +41,7 @@ export const RootNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selected
       <NodeHandle type="source" position={Position.Bottom} id="source-b" />
 
       <div className="flex items-center gap-2.5">
-        <div className="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+        <div className="w-7 h-7 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-200">
           <Network className="w-4 h-4" />
         </div>
 
@@ -53,7 +53,7 @@ export const RootNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selected
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             autoFocus
-            className="bg-zinc-800 text-zinc-100 font-semibold px-2 py-0.5 rounded outline-none border border-blue-500 text-sm w-44"
+            className="bg-zinc-800 text-zinc-100 font-semibold px-2 py-0.5 rounded outline-none border border-zinc-400 text-sm w-44"
           />
         ) : (
           <span

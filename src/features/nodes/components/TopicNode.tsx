@@ -32,11 +32,11 @@ export const TopicNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selecte
     <div
       className={`relative group bg-zinc-900 border transition-all duration-150 shadow-md ${shapeClass} ${
         selected
-          ? 'border-blue-500 ring-2 ring-blue-500/20'
-          : 'border-zinc-800 hover:border-zinc-600'
+          ? 'border-zinc-200 ring-2 ring-zinc-400/25 shadow-zinc-950/70'
+          : 'border-zinc-700 hover:border-zinc-500'
       }`}
       style={{
-        borderLeftColor: data.color || '#64748b',
+        borderLeftColor: data.color || '#e4e4e7',
         borderLeftWidth: '3px',
       }}
     >
@@ -61,7 +61,7 @@ export const TopicNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selecte
           >
             <ChevronRight
               className={`w-3.5 h-3.5 transition-transform duration-150 ${
-                data.collapsed ? 'rotate-0 text-blue-400' : 'rotate-90'
+                data.collapsed ? 'rotate-0 text-zinc-300' : 'rotate-90'
               }`}
             />
           </button>
@@ -75,7 +75,7 @@ export const TopicNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selecte
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             autoFocus
-            className="bg-zinc-800 text-zinc-100 text-xs px-1.5 py-0.5 rounded outline-none border border-blue-500 min-w-[120px]"
+            className="bg-zinc-800 text-zinc-100 text-xs px-1.5 py-0.5 rounded outline-none border border-zinc-400 min-w-[120px]"
           />
         ) : (
           <span
@@ -108,8 +108,8 @@ export const TopicNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selecte
             e.stopPropagation();
             addChildNode(id);
           }}
-          className="opacity-0 group-hover:opacity-100 transition-opacity ml-1 w-4 h-4 rounded flex items-center justify-center text-zinc-400 hover:text-blue-400 hover:bg-zinc-800"
-          title="Add child topic"
+          className="opacity-0 group-hover:opacity-100 transition-opacity ml-1 w-4 h-4 rounded flex items-center justify-center text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+          title="Add child card"
         >
           <Plus className="w-3 h-3" />
         </button>

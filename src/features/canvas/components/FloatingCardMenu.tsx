@@ -53,13 +53,13 @@ export const FloatingCardMenu: React.FC<FloatingCardMenuProps> = ({
     <div
       ref={menuRef}
       style={{ left: posX, top: posY }}
-      className="fixed z-50 w-48 bg-zinc-900/95 backdrop-blur-md border border-zinc-800 rounded-xl shadow-2xl p-1.5 animate-in fade-in zoom-in-95 duration-100 select-none"
+      className="fixed z-50 w-48 bg-zinc-900/95 backdrop-blur-md border border-zinc-700/80 rounded-xl shadow-2xl p-1.5 animate-in fade-in zoom-in-95 duration-100 select-none"
     >
-      <div className="flex items-center justify-between px-2 py-1 mb-1 border-b border-zinc-800/60 text-[11px] font-semibold text-zinc-400">
-        <span>Add Card</span>
+      <div className="flex items-center justify-between px-2 py-1 mb-1 border-b border-zinc-800 text-[11px] font-semibold text-zinc-300">
+        <span>Add Story Card</span>
         <button
           onClick={onClose}
-          className="text-zinc-500 hover:text-zinc-300 p-0.5 rounded transition-colors"
+          className="text-zinc-500 hover:text-zinc-200 p-0.5 rounded transition-colors"
         >
           <X className="w-3 h-3" />
         </button>
@@ -68,35 +68,35 @@ export const FloatingCardMenu: React.FC<FloatingCardMenuProps> = ({
       <div className="space-y-0.5">
         <button
           onClick={() => onSelectType('topic')}
-          className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-blue-600/20 hover:border-blue-500/30 border border-transparent transition-all group"
+          className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-zinc-800 border border-transparent hover:border-zinc-700 transition-all group"
         >
           <div className="flex items-center gap-2">
-            <PlusSquare className="w-3.5 h-3.5 text-blue-400" />
+            <PlusSquare className="w-3.5 h-3.5 text-zinc-200" />
             <span>Story Card</span>
           </div>
-          <kbd className="text-[10px] font-mono text-zinc-500 group-hover:text-blue-300">1</kbd>
+          <kbd className="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-200">1</kbd>
         </button>
 
         <button
           onClick={() => onSelectType('checklist')}
-          className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-emerald-600/20 hover:border-emerald-500/30 border border-transparent transition-all group"
+          className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-zinc-800 border border-transparent hover:border-zinc-700 transition-all group"
         >
           <div className="flex items-center gap-2">
-            <CheckSquare className="w-3.5 h-3.5 text-emerald-400" />
+            <CheckSquare className="w-3.5 h-3.5 text-zinc-300" />
             <span>Checklist Card</span>
           </div>
-          <kbd className="text-[10px] font-mono text-zinc-500 group-hover:text-emerald-300">2</kbd>
+          <kbd className="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-200">2</kbd>
         </button>
 
         <button
           onClick={() => onSelectType('markdown')}
-          className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-purple-600/20 hover:border-purple-500/30 border border-transparent transition-all group"
+          className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-200 hover:text-white hover:bg-zinc-800 border border-transparent hover:border-zinc-700 transition-all group"
         >
           <div className="flex items-center gap-2">
-            <FileText className="w-3.5 h-3.5 text-purple-400" />
+            <FileText className="w-3.5 h-3.5 text-zinc-300" />
             <span>Scene Notes</span>
           </div>
-          <kbd className="text-[10px] font-mono text-zinc-500 group-hover:text-purple-300">3</kbd>
+          <kbd className="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-200">3</kbd>
         </button>
       </div>
     </div>
