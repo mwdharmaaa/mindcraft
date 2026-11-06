@@ -13,9 +13,9 @@ const SHORTCUTS = [
   { key: 'Ctrl + Z', desc: 'Undo last action' },
   { key: 'Ctrl + Y / Shift+Z', desc: 'Redo last action' },
   { key: 'Double Click', desc: 'Edit title inline' },
-  { key: 'Scroll Wheel', desc: 'Slide canvas left / right' },
+  { key: 'Scroll Wheel', desc: 'Slide canvas up / down' },
   { key: '2-Finger Pinch', desc: 'Zoom canvas in / out' },
-  { key: 'Shift + Scroll', desc: 'Slide canvas vertically' },
+  { key: 'Shift + Scroll', desc: 'Slide canvas left / right' },
   { key: 'Space + Drag', desc: 'Freeform pan canvas' },
 ];
 

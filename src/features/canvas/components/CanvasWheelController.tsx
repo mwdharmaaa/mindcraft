@@ -50,11 +50,11 @@ export const CanvasWheelController: React.FC = () => {
       } else {
         // Single-axis mouse wheel:
         if (e.shiftKey) {
-          // Shift + Wheel slides vertically
-          dy = -e.deltaY * speed;
-        } else {
-          // Default Wheel slides horizontally across freeform mind map canvas
+          // Shift + Wheel slides horizontally (sideways)
           dx = -e.deltaY * speed;
+        } else {
+          // Default Wheel slides vertically (up/down)
+          dy = -e.deltaY * speed;
         }
       }
 
