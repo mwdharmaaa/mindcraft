@@ -5,6 +5,7 @@ import { NodeTypeKind, NodeShape } from '@/features/nodes/types/node.types';
 import {
   FileText,
   CheckSquare,
+  Copy,
   AlignLeft,
   Plus,
   Trash2,
@@ -26,7 +27,7 @@ export const NodeEditToolbar: React.FC<NodeEditToolbarProps> = ({
   currentKind,
   currentShape = 'rounded',
 }) => {
-  const { updateNodeData, addChildNode, deleteSubtree } = useMindMapStore();
+  const { updateNodeData, addChildNode, duplicateSubtree, deleteSubtree } = useMindMapStore();
 
   const handleSetKind = (kind: NodeTypeKind) => {
     updateNodeData(nodeId, {
@@ -119,6 +120,14 @@ export const NodeEditToolbar: React.FC<NodeEditToolbarProps> = ({
       </button>
 
       <div className="w-px h-3.5 bg-zinc-800" />
+
+      <button
+        onClick={() => duplicateSubtree(nodeId)}
+        className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+        title="Duplicate branch (Ctrl+D)"
+      >
+        <Copy className="w-3.5 h-3.5 text-zinc-300" />
+      </button>
 
       <button
         onClick={() => deleteSubtree(nodeId)}
