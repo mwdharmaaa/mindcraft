@@ -13,14 +13,26 @@ const CanvasWheelController = () => {
       e.preventDefault();
       e.stopPropagation();
       const viewport = getViewport();
-      if (e.ctrlKey) {
-        const factor = Math.exp(-e.deltaY * 8e-3);
+      if (e.ctrlKey || e.metaKey || e.altKey) {
+        const rawDelta = e.deltaMode === 1 ? e.deltaY * 18 : e.deltaMode === 2 ? e.deltaY * 50 : e.deltaY;
+        const isDiscreteWheel = Math.abs(rawDelta) >= 45;
+        const clampedDelta = isDiscreteWheel
+          ? Math.sign(rawDelta) * 14
+          : Math.sign(rawDelta) * Math.min(Math.abs(rawDelta), 35);
+        const zoomVelocity = 0.028;
+        const factor = Math.exp(-clampedDelta * zoomVelocity);
         const nextZoom = Math.min(Math.max(viewport.zoom * factor, 0.15), 2.5);
+
+        if (Math.abs(nextZoom - viewport.zoom) < 1e-4) {
+          return;
+        }
+
         const rect = container.getBoundingClientRect();
         const cursorX = e.clientX - rect.left;
         const cursorY = e.clientY - rect.top;
         const newX = cursorX - (cursorX - viewport.x) * (nextZoom / viewport.zoom);
         const newY = cursorY - (cursorY - viewport.y) * (nextZoom / viewport.zoom);
+
         setViewport({ x: newX, y: newY, zoom: nextZoom });
         return;
       }
