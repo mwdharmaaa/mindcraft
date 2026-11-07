@@ -17,6 +17,7 @@ import { nodeTypes } from '@/features/nodes/nodeTypes';
 import { edgeTypes } from '@/features/edges/edgeTypes';
 import { useKeyboardNavigation } from '@/features/canvas/hooks/useKeyboardNavigation';
 import { CanvasWheelController } from './CanvasWheelController';
+import { useThemeStore } from '@/features/theme/store/themeStore';
 
 const MindMapCanvasInner: React.FC = () => {
   const {
@@ -32,6 +33,7 @@ const MindMapCanvasInner: React.FC = () => {
   const { screenToFlowPosition } = useReactFlow();
 
   useKeyboardNavigation();
+  const currentTheme = useThemeStore((s) => s.currentTheme);
 
   const handleSelectionChange = useCallback(
     (params: OnSelectionChangeParams) => {
@@ -67,7 +69,8 @@ const MindMapCanvasInner: React.FC = () => {
 
   return (
     <div
-      className="w-full h-full relative bg-[#09090b]"
+      className="w-full h-full relative"
+      style={{ backgroundColor: currentTheme.canvasBg }}
       onDoubleClick={handleDoubleClick}
     >
       <ReactFlow
@@ -101,10 +104,10 @@ const MindMapCanvasInner: React.FC = () => {
         <CanvasWheelController />
 
         <Background
-          variant={BackgroundVariant.Dots}
-          gap={20}
-          size={1.5}
-          color="rgba(244, 244, 245, 0.12)"
+          variant={currentTheme.variant}
+          gap={currentTheme.dotGap}
+          size={currentTheme.dotSize}
+          color={currentTheme.dotColor}
         />
 
         <Controls
