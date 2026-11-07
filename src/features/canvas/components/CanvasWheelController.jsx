@@ -18,8 +18,8 @@ const CanvasWheelController = () => {
         const isDiscreteWheel = Math.abs(rawDelta) >= 45;
         const clampedDelta = isDiscreteWheel
           ? Math.sign(rawDelta) * 14
-          : Math.sign(rawDelta) * Math.min(Math.abs(rawDelta), 35);
-        const zoomVelocity = 0.028;
+          : Math.sign(rawDelta) * Math.min(Math.abs(rawDelta), 30);
+        const zoomVelocity = 0.056;
         const factor = Math.exp(-clampedDelta * zoomVelocity);
         const nextZoom = Math.min(Math.max(viewport.zoom * factor, 0.15), 2.5);
 
