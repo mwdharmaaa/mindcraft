@@ -18,6 +18,7 @@ import { edgeTypes } from '@/features/edges/edgeTypes';
 import { useKeyboardNavigation } from '@/features/canvas/hooks/useKeyboardNavigation';
 import { CanvasWheelController } from './CanvasWheelController';
 import { useThemeStore } from '@/features/theme/store/themeStore';
+import { CanvasZoomWidget } from './controls/CanvasZoomWidget';
 
 const MindMapCanvasInner: React.FC = () => {
   const {
@@ -114,6 +115,8 @@ const MindMapCanvasInner: React.FC = () => {
           showInteractive={false}
           className="!bg-zinc-900/95 !border !border-zinc-700 !rounded-xl !overflow-hidden !shadow-2xl [&>button]:!bg-zinc-900 [&>button]:!border-zinc-700 [&>button]:!text-zinc-200 hover:[&>button]:!bg-zinc-800"
         />
+
+        <CanvasZoomWidget />
 
         <MiniMap
           nodeStrokeWidth={3}
