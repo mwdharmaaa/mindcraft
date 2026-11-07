@@ -27,6 +27,7 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
   history: [{ nodes: defaultNodes, edges: defaultEdges }],
   historyIndex: 0,
   lastSavedAt: initialLoaded ? Date.now() : null,
+  isSearchOpen: false,
 
   onNodesChange: (changes) => {
     const nextNodes = applyNodeChanges(changes, get().nodes);
@@ -311,6 +312,10 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
       lastSavedAt: Date.now(),
     });
   },
+
+  openSearch: () => set({ isSearchOpen: true }),
+  closeSearch: () => set({ isSearchOpen: false }),
+  focusNode: (id) => set({ selectedNodeId: id, isSearchOpen: false }),
 
   importMindMap: (nodes, edges) => {
     const nextEdges = optimizeEdgeHandles(nodes, edges);
