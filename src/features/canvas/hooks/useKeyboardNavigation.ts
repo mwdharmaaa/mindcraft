@@ -13,6 +13,9 @@ export function useKeyboardNavigation() {
     undo,
     redo,
     openSearch,
+    duplicateSubtree,
+    copySubtree,
+    pasteSubtree,
   } = useMindMapStore();
 
   useEffect(() => {
@@ -50,6 +53,28 @@ export function useKeyboardNavigation() {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
         e.preventDefault();
         redo();
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'd') {
+        e.preventDefault();
+        if (selectedNodeId) {
+          duplicateSubtree(selectedNodeId);
+        }
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+        if (selectedNodeId) {
+          e.preventDefault();
+          copySubtree(selectedNodeId);
+        }
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
+        e.preventDefault();
+        pasteSubtree();
         return;
       }
 
@@ -207,5 +232,5 @@ export function useKeyboardNavigation() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [nodes, edges, selectedNodeId, setSelectedNodeId, addChildNode, addSiblingNode, deleteSubtree, undo, redo, openSearch]);
+  }, [nodes, edges, selectedNodeId, setSelectedNodeId, addChildNode, addSiblingNode, deleteSubtree, undo, redo, openSearch, duplicateSubtree, copySubtree, pasteSubtree]);
 }
