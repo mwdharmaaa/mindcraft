@@ -6,6 +6,7 @@ import { ConnectorSelector } from './header/ConnectorSelector';
 import { LayoutSelector } from './header/LayoutSelector';
 import { CanvasStatusIndicator } from './header/CanvasStatusIndicator';
 import { CanvasActionButtons } from './header/CanvasActionButtons';
+import { useThemeStore } from '@/features/theme/store/themeStore';
 
 interface TopNavigationProps {
   onOpenExport: () => void;
@@ -16,6 +17,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
   onOpenExport,
   onOpenShortcuts,
 }) => {
+  const openThemeModal = useThemeStore((s) => s.openThemeModal);
   const {
     undo,
     redo,
@@ -48,6 +50,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
           onReset={resetCanvas}
           onSearch={openSearch}
           onProjects={openProjectModal}
+          onTheme={openThemeModal}
         />
       </div>
     </header>

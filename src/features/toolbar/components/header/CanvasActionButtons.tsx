@@ -1,5 +1,5 @@
 import React from 'react';
-import { Share2, Keyboard, FilePlus, RotateCcw, Search, FolderKanban } from 'lucide-react';
+import { Share2, Keyboard, FilePlus, RotateCcw, Search, FolderKanban, Palette } from 'lucide-react';
 
 interface CanvasActionButtonsProps {
   onExport: () => void;
@@ -8,6 +8,7 @@ interface CanvasActionButtonsProps {
   onReset: () => void;
   onSearch?: () => void;
   onProjects?: () => void;
+  onTheme?: () => void;
 }
 
 export const CanvasActionButtons: React.FC<CanvasActionButtonsProps> = ({
@@ -17,6 +18,7 @@ export const CanvasActionButtons: React.FC<CanvasActionButtonsProps> = ({
   onReset,
   onSearch,
   onProjects,
+  onTheme,
 }) => {
   return (
     <>
@@ -37,6 +39,16 @@ export const CanvasActionButtons: React.FC<CanvasActionButtonsProps> = ({
           title="Manage workspaces"
         >
           <FolderKanban className="w-4 h-4" />
+        </button>
+      )}
+
+      {onTheme && (
+        <button
+          onClick={onTheme}
+          className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+          title="Customize theme (Ctrl+Shift+T)"
+        >
+          <Palette className="w-4 h-4" />
         </button>
       )}
 
