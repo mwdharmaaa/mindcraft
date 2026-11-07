@@ -6,7 +6,6 @@ import {
   Controls,
   MiniMap,
   Background,
-  BackgroundVariant,
   SelectionMode,
   OnSelectionChangeParams,
   ConnectionMode,

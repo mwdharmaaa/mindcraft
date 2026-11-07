@@ -18,9 +18,8 @@ export const MindMapEdge: React.FC<MindMapEdgeProps> = ({
   targetY,
   sourcePosition,
   targetPosition,
-  style = {},
+  style,
   markerEnd,
-  data,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const connectorType = useMindMapStore((s) => s.connectorType);
@@ -50,7 +49,8 @@ export const MindMapEdge: React.FC<MindMapEdgeProps> = ({
     });
   }
 
-  const strokeColor = isHovered ? '#e4e4e7' : (style.stroke as string) || '#71717a';
+  const edgeStyle = (style || {}) as React.CSSProperties;
+  const strokeColor = isHovered ? '#e4e4e7' : (edgeStyle.stroke as string) || '#71717a';
 
   return (
     <g
@@ -69,7 +69,7 @@ export const MindMapEdge: React.FC<MindMapEdgeProps> = ({
         path={edgePath}
         markerEnd={markerEnd}
         style={{
-          ...style,
+          ...edgeStyle,
           stroke: strokeColor,
           strokeWidth: isHovered ? 2.5 : 1.5,
           transition: 'stroke 0.15s, stroke-width 0.15s',

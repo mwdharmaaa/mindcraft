@@ -22,7 +22,7 @@ export function getAllDescendantIds(nodeId: string, edges: Edge[]): Set<string> 
 export function buildEdge(
   sourceId: string,
   targetId: string,
-  connectorType: ConnectorType,
+  _connectorType?: ConnectorType,
   color = '#71717a',
   sourcePos?: { x: number; y: number },
   targetPos?: { x: number; y: number }

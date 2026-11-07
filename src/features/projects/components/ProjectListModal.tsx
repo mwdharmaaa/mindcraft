@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ProjectListItem } from './ProjectListItem';
 import { NewProjectDialog } from './NewProjectDialog';
-import { getProjectList, removeProjectData, saveProjectMetaList } from '../services/projectStorage';
+import { getProjectList } from '../services/projectStorage';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 import { FolderKanban, Plus, X } from 'lucide-react';
 

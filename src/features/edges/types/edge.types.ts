@@ -7,4 +7,4 @@ export interface MindMapEdgeData extends Record<string, unknown> {
   label?: string;
 }
 
-export type MindMapEdgeProps = EdgeProps<MindMapEdgeData>;
+export type MindMapEdgeProps = EdgeProps;

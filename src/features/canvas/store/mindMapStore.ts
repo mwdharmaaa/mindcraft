@@ -472,7 +472,6 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
   },
 
   createProject: (name) => {
-    const state = get();
     const newId = `proj-${Date.now()}`;
     const blankRoot: any = {
       id: 'root-1',
