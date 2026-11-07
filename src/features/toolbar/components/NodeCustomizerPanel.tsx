@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 import {
   NodeShape,
   NodeTypeKind,
   NodePriority,
 } from '@/features/nodes/types/node.types';
-import { Trash2, Plus, GitBranch, Layers } from 'lucide-react';
+import { Trash2, Plus, GitBranch, Layers, Tag, X } from 'lucide-react';
 
 const COLOR_PALETTE = [
   '#ffffff', // crisp white
@@ -29,11 +29,30 @@ export const NodeCustomizerPanel: React.FC = () => {
     deleteSubtree,
   } = useMindMapStore();
 
+  const [tagInput, setTagInput] = useState('');
+
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
   if (!selectedNode) return null;
 
   const data = selectedNode.data;
   const isRoot = data.kind === 'root';
+
+  const handleAddTag = () => {
+    const clean = tagInput.trim().replace(/^#/, '');
+    if (!clean) return;
+    const currentTags = data.tags || [];
+    if (!currentTags.includes(clean)) {
+      updateNodeData(selectedNode.id, { tags: [...currentTags, clean] });
+    }
+    setTagInput('');
+  };
+
+  const handleRemoveTag = (targetTag: string) => {
+    const currentTags = data.tags || [];
+    updateNodeData(selectedNode.id, {
+      tags: currentTags.filter((t) => t !== targetTag),
+    });
+  };
 
   return (
     <aside className="absolute bottom-6 left-6 z-20 w-80 bg-zinc-900/95 backdrop-blur-md border border-zinc-700/80 rounded-2xl p-4 shadow-2xl space-y-4 select-none">
@@ -129,6 +148,50 @@ export const NodeCustomizerPanel: React.FC = () => {
                   {p}
                 </button>
               ))}
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1">
+                <Tag className="w-3 h-3 text-zinc-400" />
+                <span>Tags</span>
+              </label>
+            </div>
+            {data.tags && data.tags.length > 0 && (
+              <div className="flex items-center gap-1 flex-wrap">
+                {data.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="flex items-center gap-1 text-[10px] font-mono bg-zinc-800 text-zinc-300 px-1.5 py-0.5 rounded border border-zinc-700"
+                  >
+                    <span>#{tag}</span>
+                    <button
+                      onClick={() => handleRemoveTag(tag)}
+                      className="text-zinc-500 hover:text-zinc-200"
+                    >
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <div className="flex items-center gap-1">
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+                placeholder="Add tag..."
+                className="flex-1 bg-zinc-800 text-zinc-100 text-xs px-2 py-1 rounded border border-zinc-700 outline-none focus:border-zinc-400 placeholder:text-zinc-500"
+              />
+              <button
+                onClick={handleAddTag}
+                className="p-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded border border-zinc-700"
+                title="Add tag"
+              >
+                <Plus className="w-3 h-3" />
+              </button>
             </div>
           </div>
         </>

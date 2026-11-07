@@ -118,6 +118,19 @@ export const TopicNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, selecte
           </span>
         )}
 
+        {data.tags && data.tags.length > 0 && (
+          <div className="flex items-center gap-1">
+            {data.tags.map((tag) => (
+              <span
+                key={tag}
+                className="text-[9px] font-mono text-zinc-400 bg-zinc-800 px-1 py-0.5 rounded border border-zinc-700"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+
         <button
           onClick={(e) => {
             e.stopPropagation();

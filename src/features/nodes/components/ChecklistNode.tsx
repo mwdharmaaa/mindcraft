@@ -140,6 +140,19 @@ export const ChecklistNode: React.FC<NodeProps<MindNodeType>> = ({ id, data, sel
         )}
       </div>
 
+      {data.tags && data.tags.length > 0 && (
+        <div className="flex items-center gap-1 mt-2 flex-wrap">
+          {data.tags.map((tag) => (
+            <span
+              key={tag}
+              className="text-[9px] font-mono text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-700"
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
+
       <div className="mt-2.5 pt-2 border-t border-zinc-800 flex items-center gap-1.5">
         <input
           type="text"
