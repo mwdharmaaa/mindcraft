@@ -6,10 +6,13 @@ import { ExportModal } from '@/features/toolbar/components/ExportModal';
 import { ShortcutsDialog } from '@/features/toolbar/components/ShortcutsDialog';
 import { SearchModal } from '@/features/search/components/SearchModal';
 import { ProjectListModal } from '@/features/projects/components/ProjectListModal';
+import { ThemeSelectorModal } from '@/features/theme/components/ThemeSelectorModal';
+import { useThemeStore } from '@/features/theme/store/themeStore';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 
 export const App: React.FC = () => {
   const { isSearchOpen, closeSearch, isProjectModalOpen, closeProjectModal } = useMindMapStore();
+  const { isThemeModalOpen, closeThemeModal } = useThemeStore();
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
 
@@ -42,6 +45,11 @@ export const App: React.FC = () => {
       <ProjectListModal
         isOpen={isProjectModalOpen}
         onClose={closeProjectModal}
+      />
+
+      <ThemeSelectorModal
+        isOpen={isThemeModalOpen}
+        onClose={closeThemeModal}
       />
     </main>
   );
