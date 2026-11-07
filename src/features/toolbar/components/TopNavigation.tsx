@@ -27,6 +27,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
     applyLayout,
     lastSavedAt,
     openSearch,
+    openProjectModal,
   } = useMindMapStore();
 
   return (
@@ -46,6 +47,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
           onBlank={createBlankCanvas}
           onReset={resetCanvas}
           onSearch={openSearch}
+          onProjects={openProjectModal}
         />
       </div>
     </header>
