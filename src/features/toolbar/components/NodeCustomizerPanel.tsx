@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
-import { Trash2, Plus, GitBranch, Layers } from 'lucide-react';
+import { Trash2, Plus, GitBranch, Layers, Copy } from 'lucide-react';
 import { ColorPalettePicker } from './inspector/ColorPalettePicker';
 import { CardTypeSelector } from './inspector/CardTypeSelector';
 import { CardShapeSelector } from './inspector/CardShapeSelector';
@@ -14,6 +14,7 @@ export const NodeCustomizerPanel: React.FC = () => {
     updateNodeData,
     addChildNode,
     addSiblingNode,
+    duplicateSubtree,
     deleteSubtree,
   } = useMindMapStore();
 
@@ -47,13 +48,22 @@ export const NodeCustomizerPanel: React.FC = () => {
           </span>
         </div>
         {!isRoot && (
-          <button
-            onClick={() => deleteSubtree(selectedNode.id)}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => duplicateSubtree(selectedNode.id)}
+              className="p-1 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+              title="Duplicate card & branch (Ctrl+D)"
+            >
+              <Copy className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => deleteSubtree(selectedNode.id)}
             className="p-1 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
             title="Delete card & branch"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
+          </div>
         )}
       </div>
 
