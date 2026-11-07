@@ -6,6 +6,7 @@ const ChecklistHeader = ({
   totalCount,
   onTitleChange,
   onTitleBlur,
+  onClick,
   onDoubleClick
 }) => {
   return <div className="flex items-center justify-between mb-2">
@@ -18,11 +19,12 @@ const ChecklistHeader = ({
     onBlur={onTitleBlur}
     onKeyDown={(e) => e.key === "Enter" && onTitleBlur()}
     autoFocus
-    className="bg-zinc-800 text-zinc-100 text-xs px-1 py-0.5 rounded outline-none border border-zinc-400 w-full"
+    className="bg-zinc-800 text-zinc-100 text-xs px-1 py-0.5 rounded outline-none border border-zinc-400 w-full nodrag"
   /> : <span
+    onClick={onClick || onDoubleClick}
     onDoubleClick={onDoubleClick}
     className="truncate cursor-text"
-    title="Double click to edit title"
+    title="Click to edit title"
   >
             {label || "Checklist"}
           </span>}

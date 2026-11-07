@@ -11,7 +11,7 @@ const ChecklistInputForm = ({
     value={value}
     onChange={(e) => onChange(e.target.value)}
     onKeyDown={(e) => e.key === "Enter" && onSubmit()}
-    className="bg-zinc-800/80 text-zinc-200 text-xs px-2 py-1 rounded outline-none border border-transparent focus:border-zinc-400 flex-1 placeholder:text-zinc-500"
+    className="bg-zinc-800/80 text-zinc-200 text-xs px-2 py-1 rounded outline-none border border-transparent focus:border-zinc-400 flex-1 placeholder:text-zinc-500 nodrag"
   />
       <button
     onClick={onSubmit}

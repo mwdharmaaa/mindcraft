@@ -53,6 +53,10 @@ const MarkdownNode = ({ id, data, selected }) => {
     isEditingTitle={isEditingTitle}
     onTitleChange={setTitle}
     onTitleBlur={handleTitleBlur}
+    onTitleClick={(e) => {
+      e.stopPropagation();
+      setIsEditingTitle(true);
+    }}
     onTitleDoubleClick={(e) => {
       e.stopPropagation();
       setIsEditingTitle(true);
@@ -62,6 +66,10 @@ const MarkdownNode = ({ id, data, selected }) => {
 
       {isEditing ? <MarkdownEditor value={content} onChange={setContent} /> : <MarkdownViewer
     markdown={data.markdown}
+    onClick={(e) => {
+      e.stopPropagation();
+      setIsEditing(true);
+    }}
     onDoubleClick={(e) => {
       e.stopPropagation();
       setIsEditing(true);

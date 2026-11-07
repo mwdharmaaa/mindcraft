@@ -69,6 +69,10 @@ const ChecklistNode = ({ id, data, selected }) => {
     totalCount={checklist.length}
     onTitleChange={setTitle}
     onTitleBlur={handleTitleBlur}
+    onClick={(e) => {
+      e.stopPropagation();
+      setIsEditingTitle(true);
+    }}
     onDoubleClick={(e) => {
       e.stopPropagation();
       setIsEditingTitle(true);

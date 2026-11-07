@@ -5,6 +5,7 @@ const MarkdownHeader = ({
   isEditingTitle,
   onTitleChange,
   onTitleBlur,
+  onTitleClick,
   onTitleDoubleClick,
   onToggleContentEdit
 }) => {
@@ -18,11 +19,12 @@ const MarkdownHeader = ({
     onBlur={onTitleBlur}
     onKeyDown={(e) => e.key === "Enter" && onTitleBlur()}
     autoFocus
-    className="bg-zinc-800 text-zinc-100 text-xs px-1 py-0.5 rounded outline-none border border-zinc-400 w-full"
+    className="bg-zinc-800 text-zinc-100 text-xs px-1 py-0.5 rounded outline-none border border-zinc-400 w-full nodrag"
   /> : <span
+    onClick={onTitleClick || onTitleDoubleClick}
     onDoubleClick={onTitleDoubleClick}
     className="truncate cursor-text"
-    title="Double click to edit title"
+    title="Click to edit title"
   >
             {label || "Doc Note"}
           </span>}
