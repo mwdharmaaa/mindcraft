@@ -14,6 +14,7 @@ import {
 import '@xyflow/react/dist/style.css';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 import { nodeTypes } from '@/features/nodes/nodeTypes';
+import { edgeTypes } from '@/features/edges/edgeTypes';
 import { useKeyboardNavigation } from '@/features/canvas/hooks/useKeyboardNavigation';
 import { CanvasWheelController } from './CanvasWheelController';
 
@@ -73,6 +74,7 @@ const MindMapCanvasInner: React.FC = () => {
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
