@@ -1,32 +1,31 @@
-export function describe(suiteName: string, fn: () => void) {
-  console.log(`\n[SUITE] ${suiteName}`);
+function describe(suiteName, fn) {
+  console.log(`
+[SUITE] ${suiteName}`);
   fn();
 }
-
-export function test(testName: string, fn: () => void) {
+function test(testName, fn) {
   try {
     fn();
-    console.log(`  ✓ ${testName}`);
+    console.log(`  \u2713 ${testName}`);
   } catch (err) {
-    console.error(`  ✗ ${testName}`);
+    console.error(`  \u2717 ${testName}`);
     throw err;
   }
 }
-
-export function expect<T>(actual: T) {
+function expect(actual) {
   return {
-    toBe(expected: T) {
+    toBe(expected) {
       if (actual !== expected) {
         throw new Error(`Expected ${JSON.stringify(expected)}, received ${JSON.stringify(actual)}`);
       }
     },
-    toEqual(expected: any) {
+    toEqual(expected) {
       if (JSON.stringify(actual) !== JSON.stringify(expected)) {
         throw new Error(`Expected ${JSON.stringify(expected)}, received ${JSON.stringify(actual)}`);
       }
     },
-    toBeGreaterThan(expected: number) {
-      if (typeof actual !== 'number' || actual <= expected) {
+    toBeGreaterThan(expected) {
+      if (typeof actual !== "number" || actual <= expected) {
         throw new Error(`Expected ${actual} > ${expected}`);
       }
     },
@@ -39,6 +38,11 @@ export function expect<T>(actual: T) {
       if (actual) {
         throw new Error(`Expected falsy, received ${actual}`);
       }
-    },
+    }
   };
 }
+export {
+  describe,
+  expect,
+  test
+};
