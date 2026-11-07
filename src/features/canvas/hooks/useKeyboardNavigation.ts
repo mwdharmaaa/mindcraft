@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
+import { useThemeStore } from '@/features/theme/store/themeStore';
 
 export function useKeyboardNavigation() {
+  const openThemeModal = useThemeStore((s) => s.openThemeModal);
   const {
     nodes,
     edges,
@@ -31,6 +33,12 @@ export function useKeyboardNavigation() {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         openSearch();
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 't') {
+        e.preventDefault();
+        openThemeModal();
         return;
       }
 
