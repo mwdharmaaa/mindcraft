@@ -14,6 +14,13 @@ import { MindNodeData } from '@/features/nodes/types/node.types';
 import { optimizeEdgeHandles } from './edgeHelpers';
 import { loadPersistedCanvas, persistCanvas } from './canvasPersistence';
 import { cloneSubtree } from '@/features/clipboard/utils/cloneSubtree';
+import {
+  getProjectList,
+  saveProjectMetaList,
+  saveProjectData,
+  loadProjectData,
+  removeProjectData,
+} from '@/features/projects/services/projectStorage';
 
 const initialLoaded = loadPersistedCanvas();
 const defaultNodes = initialLoaded ? initialLoaded.nodes : initialNodes;
@@ -29,6 +36,8 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
   historyIndex: 0,
   lastSavedAt: initialLoaded ? Date.now() : null,
   isSearchOpen: false,
+  activeProjectId: "default",
+  isProjectModalOpen: false,
   clipboard: null,
 
   onNodesChange: (changes) => {
@@ -441,6 +450,75 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
       historyIndex: state.historyIndex + 1,
       lastSavedAt: Date.now(),
     });
+  },
+
+  openProjectModal: () => set({ isProjectModalOpen: true }),
+  closeProjectModal: () => set({ isProjectModalOpen: false }),
+
+  switchProject: (projectId) => {
+    const loaded = loadProjectData(projectId);
+    if (loaded && Array.isArray(loaded.nodes) && Array.isArray(loaded.edges)) {
+      persistCanvas(loaded.nodes as any, loaded.edges as any);
+      set({
+        activeProjectId: projectId,
+        nodes: loaded.nodes as any,
+        edges: loaded.edges as any,
+        selectedNodeId: null,
+        history: [{ nodes: loaded.nodes as any, edges: loaded.edges as any }],
+        historyIndex: 0,
+        lastSavedAt: Date.now(),
+      });
+    }
+  },
+
+  createProject: (name) => {
+    const state = get();
+    const newId = `proj-${Date.now()}`;
+    const blankRoot: any = {
+      id: 'root-1',
+      type: 'root',
+      position: { x: 400, y: 300 },
+      data: {
+        label: name,
+        kind: 'root',
+        color: '#f4f4f5',
+        priority: 'high',
+      },
+    };
+
+    saveProjectData(newId, [blankRoot], []);
+    const projects = getProjectList();
+    projects.push({
+      id: newId,
+      name,
+      nodeCount: 1,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+    saveProjectMetaList(projects);
+
+    persistCanvas([blankRoot], []);
+    set({
+      activeProjectId: newId,
+      nodes: [blankRoot],
+      edges: [],
+      selectedNodeId: 'root-1',
+      history: [{ nodes: [blankRoot], edges: [] }],
+      historyIndex: 0,
+      lastSavedAt: Date.now(),
+    });
+  },
+
+  deleteProject: (projectId) => {
+    removeProjectData(projectId);
+    const projects = getProjectList().filter((p) => p.id !== projectId);
+    saveProjectMetaList(projects);
+
+    const state = get();
+    if (state.activeProjectId === projectId) {
+      state.resetCanvas();
+      set({ activeProjectId: 'default' });
+    }
   },
 
   importMindMap: (nodes, edges) => {
