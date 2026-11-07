@@ -92,3 +92,19 @@ export function createNewChildNode(
     },
   };
 }
+
+export function calculateChildPosition(parent: Node<MindNodeData>, count: number): { x: number; y: number } {
+  const offsetX = 250;
+  const offsetY = count === 0 ? 0 : count % 2 === 1 ? Math.ceil(count / 2) * 80 : -Math.ceil(count / 2) * 80;
+  return {
+    x: parent.position.x + offsetX,
+    y: parent.position.y + offsetY,
+  };
+}
+
+export function calculateSiblingPosition(target: Node<MindNodeData>): { x: number; y: number } {
+  return {
+    x: target.position.x,
+    y: target.position.y + 80,
+  };
+}

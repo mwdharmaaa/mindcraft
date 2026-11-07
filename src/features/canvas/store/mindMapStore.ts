@@ -2,83 +2,17 @@ import { create } from 'zustand';
 import { applyNodeChanges, applyEdgeChanges, addEdge, Node, Edge } from '@xyflow/react';
 import { MindMapStoreState, ConnectorType } from './mindMapStore.types';
 import { initialNodes, initialEdges } from './initialTemplate';
-import { getAllDescendantIds, buildEdge, createNewChildNode } from './treeHelpers';
+import {
+  getAllDescendantIds,
+  buildEdge,
+  createNewChildNode,
+  calculateChildPosition,
+  calculateSiblingPosition,
+} from './treeHelpers';
 import { runMindMapLayout } from '@/features/layout/layoutEngine';
 import { MindNodeData } from '@/features/nodes/types/node.types';
-
-function optimizeEdgeHandles(nodes: Node<MindNodeData>[], edges: Edge[]): Edge[] {
-  const nodeMap = new Map<string, { x: number; y: number }>();
-  nodes.forEach((n) => nodeMap.set(n.id, n.position));
-
-  return edges.map((edge) => {
-    const sPos = nodeMap.get(edge.source);
-    const tPos = nodeMap.get(edge.target);
-    if (!sPos || !tPos) return edge;
-
-    const dx = tPos.x - sPos.x;
-    const dy = tPos.y - sPos.y;
-
-    let sourceHandle = 'source-r';
-    let targetHandle = 'target-l';
-
-    if (Math.abs(dx) >= Math.abs(dy)) {
-      if (dx < 0) {
-        sourceHandle = 'source-l';
-        targetHandle = 'target-r';
-      } else {
-        sourceHandle = 'source-r';
-        targetHandle = 'target-l';
-      }
-    } else {
-      if (dy < 0) {
-        sourceHandle = 'source-t';
-        targetHandle = 'target-b';
-      } else {
-        sourceHandle = 'source-b';
-        targetHandle = 'target-t';
-      }
-    }
-
-    if (edge.sourceHandle === sourceHandle && edge.targetHandle === targetHandle) {
-      return edge;
-    }
-
-    return {
-      ...edge,
-      sourceHandle,
-      targetHandle,
-    };
-  });
-}
-
-const STORAGE_KEY = 'mindcraft_active_canvas_v1';
-
-function loadPersistedCanvas(): { nodes: Node<MindNodeData>[]; edges: Edge[] } | null {
-  try {
-    const raw = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed.nodes) && Array.isArray(parsed.edges) && parsed.nodes.length > 0) {
-      return { nodes: parsed.nodes, edges: parsed.edges };
-    }
-  } catch {
-    // fallback
-  }
-  return null;
-}
-
-let saveTimer: ReturnType<typeof setTimeout> | null = null;
-function persistCanvas(nodes: Node<MindNodeData>[], edges: Edge[]) {
-  if (typeof window === 'undefined') return;
-  if (saveTimer) clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, edges, savedAt: Date.now() }));
-    } catch {
-      // storage quota handling
-    }
-  }, 300);
-}
+import { optimizeEdgeHandles } from './edgeHelpers';
+import { loadPersistedCanvas, persistCanvas } from './canvasPersistence';
 
 const initialLoaded = loadPersistedCanvas();
 const defaultNodes = initialLoaded ? initialLoaded.nodes : initialNodes;
@@ -141,18 +75,8 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
     const parent = state.nodes.find((n) => n.id === pid);
     if (!parent) return;
 
-    // Organic offset placement: freely places child near parent without touching any existing nodes
     const existingChildren = state.edges.filter((e) => e.source === pid);
-    const count = existingChildren.length;
-
-    // Fan-out offset (staggers children neatly in open space)
-    const offsetX = 250;
-    const offsetY = count === 0 ? 0 : count % 2 === 1 ? Math.ceil(count / 2) * 80 : -Math.ceil(count / 2) * 80;
-    const targetPos = {
-      x: parent.position.x + offsetX,
-      y: parent.position.y + offsetY,
-    };
-
+    const targetPos = calculateChildPosition(parent, existingChildren.length);
     const newNode = createNewChildNode(pid, parent, 'topic', targetPos);
     const rawEdge = buildEdge(pid, newNode.id, state.connectorType, parent.data.color, parent.position, targetPos);
 
@@ -184,12 +108,7 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
     const parent = state.nodes.find((n) => n.id === targetNode.data.parentId);
     if (!parent) return;
 
-    // Place sibling directly below current target node
-    const targetPos = {
-      x: targetNode.position.x,
-      y: targetNode.position.y + 80,
-    };
-
+    const targetPos = calculateSiblingPosition(targetNode);
     const newNode = createNewChildNode(parent.id, parent, 'topic', targetPos);
     const rawEdge = buildEdge(parent.id, newNode.id, state.connectorType, parent.data.color, parent.position, targetPos);
 

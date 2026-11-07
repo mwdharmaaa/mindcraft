@@ -9,7 +9,6 @@ import {
   RotateCcw,
   Network,
   FilePlus,
-  LayoutGrid,
 } from 'lucide-react';
 
 interface TopNavigationProps {
@@ -138,7 +137,5 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
         </div>
       </div>
     </header>
-  );
-};
   );
 };
