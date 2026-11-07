@@ -13,6 +13,7 @@ import { runMindMapLayout } from '@/features/layout/layoutEngine';
 import { MindNodeData } from '@/features/nodes/types/node.types';
 import { optimizeEdgeHandles } from './edgeHelpers';
 import { loadPersistedCanvas, persistCanvas } from './canvasPersistence';
+import { cloneSubtree } from '@/features/clipboard/utils/cloneSubtree';
 
 const initialLoaded = loadPersistedCanvas();
 const defaultNodes = initialLoaded ? initialLoaded.nodes : initialNodes;
@@ -28,6 +29,7 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
   historyIndex: 0,
   lastSavedAt: initialLoaded ? Date.now() : null,
   isSearchOpen: false,
+  clipboard: null,
 
   onNodesChange: (changes) => {
     const nextNodes = applyNodeChanges(changes, get().nodes);
@@ -316,6 +318,114 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
   openSearch: () => set({ isSearchOpen: true }),
   closeSearch: () => set({ isSearchOpen: false }),
   focusNode: (id) => set({ selectedNodeId: id, isSearchOpen: false }),
+
+  duplicateSubtree: (nodeId) => {
+    const state = get();
+    const targetId = nodeId || state.selectedNodeId;
+    if (!targetId) return;
+
+    const targetNode = state.nodes.find((n) => n.id === targetId);
+    if (!targetNode || targetNode.data.kind === 'root') return;
+
+    const cloned = cloneSubtree(targetId, state.nodes, state.edges, { x: 40, y: 80 });
+    let nextEdges = [...state.edges, ...cloned.edges];
+
+    // If target has a parent, connect the clone root to the same parent
+    const parentEdge = state.edges.find((e) => e.target === targetId);
+    if (parentEdge) {
+      const bridgeEdge = buildEdge(
+        parentEdge.source,
+        cloned.newRootId,
+        state.connectorType,
+        targetNode.data.color,
+        state.nodes.find((n) => n.id === parentEdge.source)?.position,
+        cloned.nodes.find((n) => n.id === cloned.newRootId)?.position
+      );
+      nextEdges.push(bridgeEdge);
+    }
+
+    const nextNodes = [...state.nodes, ...cloned.nodes];
+    const optimizedEdges = optimizeEdgeHandles(nextNodes, nextEdges);
+    persistCanvas(nextNodes, optimizedEdges);
+
+    set({
+      nodes: nextNodes,
+      edges: optimizedEdges,
+      selectedNodeId: cloned.newRootId,
+      history: [
+        ...state.history.slice(0, state.historyIndex + 1),
+        { nodes: nextNodes, edges: optimizedEdges },
+      ],
+      historyIndex: state.historyIndex + 1,
+      lastSavedAt: Date.now(),
+    });
+  },
+
+  copySubtree: (nodeId) => {
+    const state = get();
+    const targetId = nodeId || state.selectedNodeId;
+    if (!targetId) return;
+
+    const descendantIds = getAllDescendantIds(targetId, state.edges);
+    const targetIds = new Set<string>([targetId, ...descendantIds]);
+
+    const subNodes = state.nodes.filter((n) => targetIds.has(n.id));
+    const subEdges = state.edges.filter((e) => targetIds.has(e.source) && targetIds.has(e.target));
+
+    set({
+      clipboard: {
+        rootId: targetId,
+        nodes: subNodes,
+        edges: subEdges,
+        copiedAt: Date.now(),
+      },
+    });
+  },
+
+  pasteSubtree: (targetParentId) => {
+    const state = get();
+    if (!state.clipboard) return;
+
+    const parentId = targetParentId || state.selectedNodeId;
+    const parentNode = parentId ? state.nodes.find((n) => n.id === parentId) : null;
+
+    const cloned = cloneSubtree(
+      state.clipboard.rootId,
+      state.clipboard.nodes,
+      state.clipboard.edges,
+      { x: parentNode ? 240 : 60, y: parentNode ? 40 : 60 }
+    );
+
+    let nextEdges = [...state.edges, ...cloned.edges];
+
+    if (parentNode) {
+      const bridgeEdge = buildEdge(
+        parentNode.id,
+        cloned.newRootId,
+        state.connectorType,
+        parentNode.data.color,
+        parentNode.position,
+        cloned.nodes.find((n) => n.id === cloned.newRootId)?.position
+      );
+      nextEdges.push(bridgeEdge);
+    }
+
+    const nextNodes = [...state.nodes, ...cloned.nodes];
+    const optimizedEdges = optimizeEdgeHandles(nextNodes, nextEdges);
+    persistCanvas(nextNodes, optimizedEdges);
+
+    set({
+      nodes: nextNodes,
+      edges: optimizedEdges,
+      selectedNodeId: cloned.newRootId,
+      history: [
+        ...state.history.slice(0, state.historyIndex + 1),
+        { nodes: nextNodes, edges: optimizedEdges },
+      ],
+      historyIndex: state.historyIndex + 1,
+      lastSavedAt: Date.now(),
+    });
+  },
 
   importMindMap: (nodes, edges) => {
     const nextEdges = optimizeEdgeHandles(nodes, edges);
