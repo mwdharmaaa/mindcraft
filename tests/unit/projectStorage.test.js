@@ -1,4 +1,4 @@
-import { describe, test, expect } from "./testRunner";
+import { describe, test, expect } from "./testRunner.js";
 describe("Project Storage Contracts", () => {
   test("validates project metadata schema properties", () => {
     const meta = {

@@ -1,5 +1,5 @@
-import { calculateDagreLayout } from "./algorithms/dagreTreeLayout";
-import { calculateRadialLayout } from "./algorithms/radialLayout";
+import { calculateDagreLayout } from "./algorithms/dagreTreeLayout.js";
+import { calculateRadialLayout } from "./algorithms/radialLayout.js";
 function runMindMapLayout(nodes, edges, direction) {
   if (direction === "RADIAL") {
     return calculateRadialLayout(nodes, edges);

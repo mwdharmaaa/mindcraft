@@ -1,5 +1,5 @@
-import { describe, test, expect } from "./testRunner";
-import { filterNodes } from "../../src/features/search/utils/searchFilter";
+import { describe, test, expect } from "./testRunner.js";
+import { filterNodes } from "../../src/features/search/utils/searchFilter.js";
 describe("Search Filter Algorithm", () => {
   const nodes = [
     { id: "1", data: { label: "World Lore", kind: "topic", tags: ["fantasy", "lore"] } },

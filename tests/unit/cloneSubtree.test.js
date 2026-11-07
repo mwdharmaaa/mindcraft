@@ -1,5 +1,5 @@
-import { describe, test, expect } from "./testRunner";
-import { cloneSubtree } from "../../src/features/clipboard/utils/cloneSubtree";
+import { describe, test, expect } from "./testRunner.js";
+import { cloneSubtree } from "../../src/features/clipboard/utils/cloneSubtree.js";
 describe("Subtree Cloning", () => {
   test("cloneSubtree creates unique IDs and updates intra-subtree edge mapping", () => {
     const nodes = [

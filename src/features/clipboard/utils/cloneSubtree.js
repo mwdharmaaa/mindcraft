@@ -1,4 +1,4 @@
-import { getAllDescendantIds } from "@/features/canvas/store/treeHelpers";
+import { getAllDescendantIds } from "../../canvas/store/treeHelpers.js";
 function cloneSubtree(sourceRootId, allNodes, allEdges, offset = { x: 50, y: 50 }) {
   const descendantIds = getAllDescendantIds(sourceRootId, allEdges);
   const targetIds = /* @__PURE__ */ new Set([sourceRootId, ...descendantIds]);

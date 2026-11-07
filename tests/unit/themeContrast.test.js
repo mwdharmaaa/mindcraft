@@ -1,5 +1,5 @@
-import { describe, test, expect } from "./testRunner";
-import { isDarkHexColor } from "../../src/features/theme/utils/themeContrast";
+import { describe, test, expect } from "./testRunner.js";
+import { isDarkHexColor } from "../../src/features/theme/utils/themeContrast.js";
 describe("Theme Contrast Utility", () => {
   test("correctly identifies dark and light hex colors", () => {
     expect(isDarkHexColor("#000000")).toBe(true);

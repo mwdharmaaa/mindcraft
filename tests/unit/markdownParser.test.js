@@ -1,5 +1,5 @@
-import { describe, test, expect } from "./testRunner";
-import { serializeToMarkdown, deserializeFromMarkdown } from "../../src/features/persistence/formatters/markdownParser";
+import { describe, test, expect } from "./testRunner.js";
+import { serializeToMarkdown, deserializeFromMarkdown } from "../../src/features/persistence/formatters/markdownParser.js";
 describe("Markdown Outline Parser", () => {
   test("serializeToMarkdown creates indented outline", () => {
     const nodes = [

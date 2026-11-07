@@ -1,5 +1,5 @@
-import { describe, test, expect } from "./testRunner";
-import { serializeToJson, deserializeFromJson } from "../../src/features/persistence/formatters/jsonSchema";
+import { describe, test, expect } from "./testRunner.js";
+import { serializeToJson, deserializeFromJson } from "../../src/features/persistence/formatters/jsonSchema.js";
 describe("JSON Schema Persistence", () => {
   test("serializeToJson creates valid export payload", () => {
     const nodes = [{ id: "1", position: { x: 0, y: 0 }, data: { label: "Node 1", kind: "root" } }];

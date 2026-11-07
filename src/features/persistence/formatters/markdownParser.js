@@ -1,5 +1,5 @@
 import { Position } from "@xyflow/react";
-import { runMindMapLayout } from "@/features/layout/layoutEngine";
+import { runMindMapLayout } from "../../layout/layoutEngine.js";
 function serializeToMarkdown(nodes, edges) {
   if (nodes.length === 0) return "";
   const root = nodes.find((n) => n.data.kind === "root") || nodes[0];

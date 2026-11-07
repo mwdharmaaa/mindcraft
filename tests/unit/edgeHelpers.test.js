@@ -1,5 +1,5 @@
-import { describe, test, expect } from "./testRunner";
-import { optimizeEdgeHandles } from "../../src/features/canvas/store/edgeHelpers";
+import { describe, test, expect } from "./testRunner.js";
+import { optimizeEdgeHandles } from "../../src/features/canvas/store/edgeHelpers.js";
 describe("Edge Helpers", () => {
   test("optimizeEdgeHandles connects right to left for horizontal direction", () => {
     const nodes = [

@@ -1,5 +1,5 @@
-import { describe, test, expect } from "./testRunner";
-import { getAllDescendantIds, calculateChildPosition, calculateSiblingPosition } from "../../src/features/canvas/store/treeHelpers";
+import { describe, test, expect } from "./testRunner.js";
+import { getAllDescendantIds, calculateChildPosition, calculateSiblingPosition } from "../../src/features/canvas/store/treeHelpers.js";
 describe("Tree Helpers", () => {
   test("getAllDescendantIds finds all transitive children", () => {
     const edges = [
