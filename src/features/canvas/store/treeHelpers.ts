@@ -59,7 +59,7 @@ export function buildEdge(
     target: targetId,
     sourceHandle,
     targetHandle,
-    type: connectorType,
+    type: 'mindmap',
     style: { stroke: color, strokeWidth: 1.5 },
   };
 }
