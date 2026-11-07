@@ -76,7 +76,7 @@ const MindMapCanvasInner = () => {
     zoomOnDoubleClick={false}
     panOnScroll={false}
     zoomOnScroll={false}
-    zoomOnPinch={true}
+    zoomOnPinch={false}
     zoomActivationKeyCode={null}
     panOnDrag={[0, 1, 2]}
     fitView
