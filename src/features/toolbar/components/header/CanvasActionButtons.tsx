@@ -1,11 +1,12 @@
 import React from 'react';
-import { Share2, Keyboard, FilePlus, RotateCcw } from 'lucide-react';
+import { Share2, Keyboard, FilePlus, RotateCcw, Search } from 'lucide-react';
 
 interface CanvasActionButtonsProps {
   onExport: () => void;
   onShortcuts: () => void;
   onBlank: () => void;
   onReset: () => void;
+  onSearch?: () => void;
 }
 
 export const CanvasActionButtons: React.FC<CanvasActionButtonsProps> = ({
@@ -13,9 +14,20 @@ export const CanvasActionButtons: React.FC<CanvasActionButtonsProps> = ({
   onShortcuts,
   onBlank,
   onReset,
+  onSearch,
 }) => {
   return (
     <>
+      {onSearch && (
+        <button
+          onClick={onSearch}
+          className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+          title="Search cards (Ctrl+K)"
+        >
+          <Search className="w-4 h-4" />
+        </button>
+      )}
+
       <button
         onClick={onExport}
         className="flex items-center gap-1.5 px-3 py-1 text-xs rounded-lg text-zinc-100 hover:text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-500 font-medium transition-all shadow-sm"

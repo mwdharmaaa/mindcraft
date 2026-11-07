@@ -26,6 +26,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
     layoutDirection,
     applyLayout,
     lastSavedAt,
+    openSearch,
   } = useMindMapStore();
 
   return (
@@ -44,6 +45,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = ({
           onShortcuts={onOpenShortcuts}
           onBlank={createBlankCanvas}
           onReset={resetCanvas}
+          onSearch={openSearch}
         />
       </div>
     </header>

@@ -4,8 +4,11 @@ import { TopNavigation } from '@/features/toolbar/components/TopNavigation';
 import { NodeCustomizerPanel } from '@/features/toolbar/components/NodeCustomizerPanel';
 import { ExportModal } from '@/features/toolbar/components/ExportModal';
 import { ShortcutsDialog } from '@/features/toolbar/components/ShortcutsDialog';
+import { SearchModal } from '@/features/search/components/SearchModal';
+import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 
 export const App: React.FC = () => {
+  const { isSearchOpen, closeSearch } = useMindMapStore();
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
 
@@ -28,6 +31,11 @@ export const App: React.FC = () => {
       <ShortcutsDialog
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}
+      />
+
+      <SearchModal
+        isOpen={isSearchOpen}
+        onClose={closeSearch}
       />
     </main>
   );
