@@ -427,6 +427,22 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
     });
   },
 
+  deleteEdge: (edgeId) => {
+    const state = get();
+    const nextEdges = state.edges.filter((e) => e.id !== edgeId);
+    persistCanvas(state.nodes, nextEdges);
+
+    set({
+      edges: nextEdges,
+      history: [
+        ...state.history.slice(0, state.historyIndex + 1),
+        { nodes: state.nodes, edges: nextEdges },
+      ],
+      historyIndex: state.historyIndex + 1,
+      lastSavedAt: Date.now(),
+    });
+  },
+
   importMindMap: (nodes, edges) => {
     const nextEdges = optimizeEdgeHandles(nodes, edges);
     persistCanvas(nodes, nextEdges);
