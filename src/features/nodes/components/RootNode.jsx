@@ -42,12 +42,17 @@ const RootNode = ({ id, data, selected }) => {
     onBlur={handleBlur}
     onKeyDown={handleKeyDown}
     autoFocus
-    className="bg-zinc-800 text-zinc-100 font-semibold px-2 py-0.5 rounded outline-none border border-zinc-400 text-sm w-44"
+    className="bg-zinc-800 text-zinc-100 font-semibold px-2 py-0.5 rounded outline-none border border-zinc-400 text-sm w-44 nodrag"
   /> : <span
+    onClick={(e) => {
+      e.stopPropagation();
+      setIsEditing(true);
+    }}
     onDoubleClick={(e) => {
       e.stopPropagation();
       setIsEditing(true);
     }}
+    title="Click to edit central idea"
     className="text-zinc-100 font-semibold text-sm tracking-tight cursor-text select-text"
   >
             {data.label}

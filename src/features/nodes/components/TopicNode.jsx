@@ -59,6 +59,10 @@ const TopicNode = ({ id, data, selected }) => {
     label={label}
     onChange={setLabel}
     onBlur={handleBlur}
+    onClick={(e) => {
+      e.stopPropagation();
+      setIsEditing(true);
+    }}
     onDoubleClick={(e) => {
       e.stopPropagation();
       setIsEditing(true);
