@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 import { useThemeStore } from '@/features/theme/store/themeStore';
+import { useReactFlow } from '@xyflow/react';
 
 export function useKeyboardNavigation() {
+  const { fitView, setViewport, getViewport } = useReactFlow();
   const openThemeModal = useThemeStore((s) => s.openThemeModal);
   const {
     nodes,
@@ -39,6 +41,19 @@ export function useKeyboardNavigation() {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 't') {
         e.preventDefault();
         openThemeModal();
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key === '0') {
+        e.preventDefault();
+        const vp = getViewport();
+        setViewport({ x: vp.x, y: vp.y, zoom: 1 }, { duration: 200 });
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key === '9') {
+        e.preventDefault();
+        fitView({ padding: 0.2, duration: 250 });
         return;
       }
 
@@ -240,5 +255,5 @@ export function useKeyboardNavigation() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [nodes, edges, selectedNodeId, setSelectedNodeId, addChildNode, addSiblingNode, deleteSubtree, undo, redo, openSearch, duplicateSubtree, copySubtree, pasteSubtree]);
+  }, [nodes, edges, selectedNodeId, setSelectedNodeId, addChildNode, addSiblingNode, deleteSubtree, undo, redo, openSearch, duplicateSubtree, copySubtree, pasteSubtree, fitView, setViewport, getViewport]);
 }
