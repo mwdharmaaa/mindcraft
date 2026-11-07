@@ -10,6 +10,7 @@ const SHORTCUTS = [
   { key: 'Double Click Canvas', desc: 'Create new empty card' },
   { key: 'Click Card', desc: 'Open contextual edit navigation' },
   { key: 'Double Click Card', desc: 'Edit title inline' },
+  { key: 'Arrow Keys', desc: 'Navigate focus (child / parent / siblings)' },
   { key: 'Tab', desc: 'Add connected child card' },
   { key: 'Enter', desc: 'Add sibling card' },
   { key: 'Del / Backspace', desc: 'Delete card and descendants' },
