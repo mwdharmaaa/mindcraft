@@ -1,5 +1,6 @@
 import { Node, Edge, OnNodesChange, OnEdgesChange, OnConnect } from '@xyflow/react';
 import { MindNodeData } from '@/features/nodes/types/node.types';
+import { ClipboardSubtree } from '@/features/clipboard/types/clipboard.types';
 
 export type LayoutDirection = 'LR' | 'TB' | 'RADIAL';
 export type ConnectorType = 'bezier' | 'straight' | 'smoothstep';
@@ -19,6 +20,7 @@ export interface MindMapStoreState {
   historyIndex: number;
   lastSavedAt: number | null;
   isSearchOpen: boolean;
+  clipboard: ClipboardSubtree | null;
 
   onNodesChange: OnNodesChange<Node<MindNodeData>>;
   onEdgesChange: OnEdgesChange;
@@ -41,4 +43,7 @@ export interface MindMapStoreState {
   openSearch: () => void;
   closeSearch: () => void;
   focusNode: (id: string) => void;
+  duplicateSubtree: (nodeId?: string) => void;
+  copySubtree: (nodeId?: string) => void;
+  pasteSubtree: (targetParentId?: string) => void;
 }
