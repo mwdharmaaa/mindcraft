@@ -16,10 +16,11 @@ const CanvasWheelController = () => {
       if (e.ctrlKey || e.metaKey || e.altKey) {
         const rawDelta = e.deltaMode === 1 ? e.deltaY * 18 : e.deltaMode === 2 ? e.deltaY * 50 : e.deltaY;
         const isDiscreteWheel = Math.abs(rawDelta) >= 45;
-        const PINCH_VELOCITY = 0.09;
+        const ZOOM_MULTIPLIER = 1.5;
+        const PINCH_VELOCITY = 0.09 * ZOOM_MULTIPLIER;
         const normalizedDelta = isDiscreteWheel
-          ? Math.sign(rawDelta) * 0.48
-          : Math.sign(rawDelta) * Math.min(Math.abs(rawDelta) * PINCH_VELOCITY, 0.95);
+          ? Math.sign(rawDelta) * (0.48 * ZOOM_MULTIPLIER)
+          : Math.sign(rawDelta) * Math.min(Math.abs(rawDelta) * PINCH_VELOCITY, 1.2);
         const factor = Math.exp(-normalizedDelta);
         const nextZoom = Math.min(Math.max(viewport.zoom * factor, 0.15), 2.5);
 
@@ -36,7 +37,7 @@ const CanvasWheelController = () => {
         setViewport({ x: newX, y: newY, zoom: nextZoom });
         return;
       }
-      const SCROLL_SPEED = 1.15;
+      const SCROLL_SPEED = 1.5;
       let dx = 0;
       let dy = 0;
       if (Math.abs(e.deltaX) > 0) {
