@@ -12,6 +12,7 @@ export function useKeyboardNavigation() {
     deleteSubtree,
     undo,
     redo,
+    openSearch,
   } = useMindMapStore();
 
   useEffect(() => {
@@ -23,6 +24,18 @@ export function useKeyboardNavigation() {
         (activeEl as HTMLElement)?.isContentEditable;
 
       if (isInputFocused) return;
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        openSearch();
+        return;
+      }
+
+      if (e.key === '/' && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        openSearch();
+        return;
+      }
 
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
         e.preventDefault();
@@ -194,5 +207,5 @@ export function useKeyboardNavigation() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [nodes, edges, selectedNodeId, setSelectedNodeId, addChildNode, addSiblingNode, deleteSubtree, undo, redo]);
+  }, [nodes, edges, selectedNodeId, setSelectedNodeId, addChildNode, addSiblingNode, deleteSubtree, undo, redo, openSearch]);
 }
