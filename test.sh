@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -e
 
-echo "=================================================="
-echo "[*] MindCraft - Test Suite & Verification"
-echo "=================================================="
+echo "[MindCraft] Running test suite & build verification..."
 
-echo "[*] Running TypeScript typechecking and production build..."
+# 1. Typecheck and build verification
 npm run build
 
-echo "[OK] Build verification succeeded without errors."
-echo "=================================================="
+# 2. Run unit tests
+node scripts/run-tests.mjs
+
+echo "[MindCraft] All tests and builds completed with 0 errors."
