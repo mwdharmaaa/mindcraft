@@ -43,6 +43,7 @@ export interface MindMapStoreState {
   openSearch: () => void;
   closeSearch: () => void;
   focusNode: (id: string) => void;
+  deleteEdge: (edgeId: string) => void;
   duplicateSubtree: (nodeId?: string) => void;
   copySubtree: (nodeId?: string) => void;
   pasteSubtree: (targetParentId?: string) => void;
