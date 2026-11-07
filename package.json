@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --open",
     "build": "tsc -b && vite build && node scripts/sync-build.cjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:unit": "node scripts/run-tests.mjs"
   },
   "dependencies": {
     "@xyflow/react": "^12.12.1",
