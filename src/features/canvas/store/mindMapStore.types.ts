@@ -19,6 +19,8 @@ export interface MindMapStoreState {
   history: MindMapHistoryItem[];
   historyIndex: number;
   lastSavedAt: number | null;
+  activeProjectId: string;
+  isProjectModalOpen: boolean;
   isSearchOpen: boolean;
   clipboard: ClipboardSubtree | null;
 
@@ -44,6 +46,11 @@ export interface MindMapStoreState {
   closeSearch: () => void;
   focusNode: (id: string) => void;
   deleteEdge: (edgeId: string) => void;
+  openProjectModal: () => void;
+  closeProjectModal: () => void;
+  switchProject: (projectId: string) => void;
+  createProject: (name: string) => void;
+  deleteProject: (projectId: string) => void;
   duplicateSubtree: (nodeId?: string) => void;
   copySubtree: (nodeId?: string) => void;
   pasteSubtree: (targetParentId?: string) => void;
