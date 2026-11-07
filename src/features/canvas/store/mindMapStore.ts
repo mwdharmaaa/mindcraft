@@ -51,29 +51,67 @@ function optimizeEdgeHandles(nodes: Node<MindNodeData>[], edges: Edge[]): Edge[]
   });
 }
 
+const STORAGE_KEY = 'mindcraft_active_canvas_v1';
+
+function loadPersistedCanvas(): { nodes: Node<MindNodeData>[]; edges: Edge[] } | null {
+  try {
+    const raw = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed.nodes) && Array.isArray(parsed.edges) && parsed.nodes.length > 0) {
+      return { nodes: parsed.nodes, edges: parsed.edges };
+    }
+  } catch {
+    // fallback
+  }
+  return null;
+}
+
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
+function persistCanvas(nodes: Node<MindNodeData>[], edges: Edge[]) {
+  if (typeof window === 'undefined') return;
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, edges, savedAt: Date.now() }));
+    } catch {
+      // storage quota handling
+    }
+  }, 300);
+}
+
+const initialLoaded = loadPersistedCanvas();
+const defaultNodes = initialLoaded ? initialLoaded.nodes : initialNodes;
+const defaultEdges = initialLoaded ? initialLoaded.edges : optimizeEdgeHandles(initialNodes, initialEdges);
+
 export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
-  nodes: initialNodes,
-  edges: optimizeEdgeHandles(initialNodes, initialEdges),
+  nodes: defaultNodes,
+  edges: defaultEdges,
   selectedNodeId: null,
   layoutDirection: 'LR',
   connectorType: 'smoothstep',
-  history: [{ nodes: initialNodes, edges: initialEdges }],
+  history: [{ nodes: defaultNodes, edges: defaultEdges }],
   historyIndex: 0,
+  lastSavedAt: initialLoaded ? Date.now() : null,
 
   onNodesChange: (changes) => {
     const nextNodes = applyNodeChanges(changes, get().nodes);
     const hasPositionChange = changes.some((c) => c.type === 'position');
     const nextEdges = hasPositionChange ? optimizeEdgeHandles(nextNodes, get().edges) : get().edges;
-    set({ nodes: nextNodes, edges: nextEdges });
+    persistCanvas(nextNodes, nextEdges);
+    set({ nodes: nextNodes, edges: nextEdges, lastSavedAt: Date.now() });
   },
 
   onEdgesChange: (changes) => {
-    set({ edges: applyEdgeChanges(changes, get().edges) });
+    const nextEdges = applyEdgeChanges(changes, get().edges);
+    persistCanvas(get().nodes, nextEdges);
+    set({ edges: nextEdges, lastSavedAt: Date.now() });
   },
 
   onConnect: (connection) => {
     const nextEdges = optimizeEdgeHandles(get().nodes, addEdge(connection, get().edges));
-    set({ edges: nextEdges });
+    persistCanvas(get().nodes, nextEdges);
+    set({ edges: nextEdges, lastSavedAt: Date.now() });
   },
 
   setSelectedNodeId: (id) => set({ selectedNodeId: id }),
@@ -91,7 +129,8 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
         },
       };
     });
-    set({ nodes: nextNodes });
+    persistCanvas(nextNodes, get().edges);
+    set({ nodes: nextNodes, lastSavedAt: Date.now() });
   },
 
   addChildNode: (parentId) => {
@@ -119,6 +158,7 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
 
     const nextNodes = [...state.nodes, newNode];
     const nextEdges = optimizeEdgeHandles(nextNodes, [...state.edges, rawEdge]);
+    persistCanvas(nextNodes, nextEdges);
 
     set({
       nodes: nextNodes,
@@ -129,6 +169,7 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
         { nodes: nextNodes, edges: nextEdges },
       ],
       historyIndex: state.historyIndex + 1,
+      lastSavedAt: Date.now(),
     });
   },
 
@@ -154,6 +195,7 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
 
     const nextNodes = [...state.nodes, newNode];
     const nextEdges = optimizeEdgeHandles(nextNodes, [...state.edges, rawEdge]);
+    persistCanvas(nextNodes, nextEdges);
 
     set({
       nodes: nextNodes,
@@ -164,6 +206,7 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
         { nodes: nextNodes, edges: nextEdges },
       ],
       historyIndex: state.historyIndex + 1,
+      lastSavedAt: Date.now(),
     });
   },
 
@@ -206,6 +249,7 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
     }
 
     const nextNodes = [...state.nodes, newNode];
+    persistCanvas(nextNodes, nextEdges);
 
     set({
       nodes: nextNodes,
@@ -216,6 +260,7 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
         { nodes: nextNodes, edges: nextEdges },
       ],
       historyIndex: state.historyIndex + 1,
+      lastSavedAt: Date.now(),
     });
   },
 
@@ -229,6 +274,7 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
 
     const nextNodes = state.nodes.filter((n) => !toDelete.has(n.id));
     const nextEdges = state.edges.filter((e) => !toDelete.has(e.source) && !toDelete.has(e.target));
+    persistCanvas(nextNodes, nextEdges);
 
     set({
       nodes: nextNodes,
@@ -239,6 +285,7 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
         { nodes: nextNodes, edges: nextEdges },
       ],
       historyIndex: state.historyIndex + 1,
+      lastSavedAt: Date.now(),
     });
   },
 
@@ -261,13 +308,15 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
       return e;
     });
 
-    set({ nodes: nextNodes, edges: nextEdges });
+    persistCanvas(nextNodes, nextEdges);
+    set({ nodes: nextNodes, edges: nextEdges, lastSavedAt: Date.now() });
   },
 
   applyLayout: (direction) => {
     const state = get();
     const nextDir = direction || state.layoutDirection;
     const layoutResult = runMindMapLayout(state.nodes, state.edges, nextDir);
+    persistCanvas(layoutResult.nodes, layoutResult.edges);
 
     set({
       nodes: layoutResult.nodes,
@@ -278,19 +327,22 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
         { nodes: layoutResult.nodes, edges: layoutResult.edges },
       ],
       historyIndex: state.historyIndex + 1,
+      lastSavedAt: Date.now(),
     });
   },
 
   setConnectorType: (type: ConnectorType) => {
     const nextEdges = get().edges.map((e) => ({ ...e, type }));
-    set({ edges: nextEdges, connectorType: type });
+    persistCanvas(get().nodes, nextEdges);
+    set({ edges: nextEdges, connectorType: type, lastSavedAt: Date.now() });
   },
 
   undo: () => {
     const { history, historyIndex } = get();
     if (historyIndex > 0) {
       const prev = history[historyIndex - 1];
-      set({ nodes: prev.nodes, edges: prev.edges, historyIndex: historyIndex - 1 });
+      persistCanvas(prev.nodes, prev.edges);
+      set({ nodes: prev.nodes, edges: prev.edges, historyIndex: historyIndex - 1, lastSavedAt: Date.now() });
     }
   },
 
@@ -298,27 +350,59 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
     const { history, historyIndex } = get();
     if (historyIndex < history.length - 1) {
       const next = history[historyIndex + 1];
-      set({ nodes: next.nodes, edges: next.edges, historyIndex: historyIndex + 1 });
+      persistCanvas(next.nodes, next.edges);
+      set({ nodes: next.nodes, edges: next.edges, historyIndex: historyIndex + 1, lastSavedAt: Date.now() });
     }
   },
 
   resetCanvas: () => {
+    const nextEdges = optimizeEdgeHandles(initialNodes, initialEdges);
+    persistCanvas(initialNodes, nextEdges);
     set({
       nodes: initialNodes,
-      edges: initialEdges,
+      edges: nextEdges,
       selectedNodeId: null,
-      history: [{ nodes: initialNodes, edges: initialEdges }],
+      history: [{ nodes: initialNodes, edges: nextEdges }],
       historyIndex: 0,
+      lastSavedAt: Date.now(),
+    });
+  },
+
+  createBlankCanvas: () => {
+    const blankRoot: Node<MindNodeData> = {
+      id: 'root-1',
+      type: 'root',
+      position: { x: 400, y: 300 },
+      data: {
+        label: 'Central Theme',
+        kind: 'root',
+        color: '#f4f4f5',
+        priority: 'high',
+      },
+    };
+    const nextNodes = [blankRoot];
+    const nextEdges: Edge[] = [];
+    persistCanvas(nextNodes, nextEdges);
+    set({
+      nodes: nextNodes,
+      edges: nextEdges,
+      selectedNodeId: 'root-1',
+      history: [{ nodes: nextNodes, edges: nextEdges }],
+      historyIndex: 0,
+      lastSavedAt: Date.now(),
     });
   },
 
   importMindMap: (nodes, edges) => {
+    const nextEdges = optimizeEdgeHandles(nodes, edges);
+    persistCanvas(nodes, nextEdges);
     set({
       nodes,
-      edges,
+      edges: nextEdges,
       selectedNodeId: null,
-      history: [{ nodes, edges }],
+      history: [{ nodes, edges: nextEdges }],
       historyIndex: 0,
+      lastSavedAt: Date.now(),
     });
   },
 }));

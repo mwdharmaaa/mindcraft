@@ -17,6 +17,7 @@ export interface MindMapStoreState {
   connectorType: ConnectorType;
   history: MindMapHistoryItem[];
   historyIndex: number;
+  lastSavedAt: number | null;
 
   onNodesChange: OnNodesChange<Node<MindNodeData>>;
   onEdgesChange: OnEdgesChange;
@@ -34,5 +35,6 @@ export interface MindMapStoreState {
   undo: () => void;
   redo: () => void;
   resetCanvas: () => void;
+  createBlankCanvas: () => void;
   importMindMap: (nodes: Node<MindNodeData>[], edges: Edge[]) => void;
 }
