@@ -1,37 +1,33 @@
-import { create } from 'zustand';
-import { applyNodeChanges, applyEdgeChanges, addEdge, Node, Edge } from '@xyflow/react';
-import { MindMapStoreState, ConnectorType } from './mindMapStore.types';
-import { initialNodes, initialEdges } from './initialTemplate';
+import { create } from "zustand";
+import { applyNodeChanges, applyEdgeChanges, addEdge } from "@xyflow/react";
+import { initialNodes, initialEdges } from "./initialTemplate";
 import {
   getAllDescendantIds,
   buildEdge,
   createNewChildNode,
   calculateChildPosition,
-  calculateSiblingPosition,
-} from './treeHelpers';
-import { runMindMapLayout } from '@/features/layout/layoutEngine';
-import { MindNodeData } from '@/features/nodes/types/node.types';
-import { optimizeEdgeHandles } from './edgeHelpers';
-import { loadPersistedCanvas, persistCanvas } from './canvasPersistence';
-import { cloneSubtree } from '@/features/clipboard/utils/cloneSubtree';
+  calculateSiblingPosition
+} from "./treeHelpers";
+import { runMindMapLayout } from "@/features/layout/layoutEngine";
+import { optimizeEdgeHandles } from "./edgeHelpers";
+import { loadPersistedCanvas, persistCanvas } from "./canvasPersistence";
+import { cloneSubtree } from "@/features/clipboard/utils/cloneSubtree";
 import {
   getProjectList,
   saveProjectMetaList,
   saveProjectData,
   loadProjectData,
-  removeProjectData,
-} from '@/features/projects/services/projectStorage';
-
+  removeProjectData
+} from "@/features/projects/services/projectStorage";
 const initialLoaded = loadPersistedCanvas();
 const defaultNodes = initialLoaded ? initialLoaded.nodes : initialNodes;
 const defaultEdges = initialLoaded ? initialLoaded.edges : optimizeEdgeHandles(initialNodes, initialEdges);
-
-export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
+const useMindMapStore = create((set, get) => ({
   nodes: defaultNodes,
   edges: defaultEdges,
   selectedNodeId: null,
-  layoutDirection: 'LR',
-  connectorType: 'smoothstep',
+  layoutDirection: "LR",
+  connectorType: "smoothstep",
   history: [{ nodes: defaultNodes, edges: defaultEdges }],
   historyIndex: 0,
   lastSavedAt: initialLoaded ? Date.now() : null,
@@ -39,29 +35,24 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
   activeProjectId: "default",
   isProjectModalOpen: false,
   clipboard: null,
-
   onNodesChange: (changes) => {
     const nextNodes = applyNodeChanges(changes, get().nodes);
-    const hasPositionChange = changes.some((c) => c.type === 'position');
+    const hasPositionChange = changes.some((c) => c.type === "position");
     const nextEdges = hasPositionChange ? optimizeEdgeHandles(nextNodes, get().edges) : get().edges;
     persistCanvas(nextNodes, nextEdges);
     set({ nodes: nextNodes, edges: nextEdges, lastSavedAt: Date.now() });
   },
-
   onEdgesChange: (changes) => {
     const nextEdges = applyEdgeChanges(changes, get().edges);
     persistCanvas(get().nodes, nextEdges);
     set({ edges: nextEdges, lastSavedAt: Date.now() });
   },
-
   onConnect: (connection) => {
     const nextEdges = optimizeEdgeHandles(get().nodes, addEdge(connection, get().edges));
     persistCanvas(get().nodes, nextEdges);
     set({ edges: nextEdges, lastSavedAt: Date.now() });
   },
-
   setSelectedNodeId: (id) => set({ selectedNodeId: id }),
-
   updateNodeData: (id, partialData) => {
     const nextNodes = get().nodes.map((node) => {
       if (node.id !== id) return node;
@@ -71,203 +62,171 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
         type: nextType,
         data: {
           ...node.data,
-          ...partialData,
-        },
+          ...partialData
+        }
       };
     });
     persistCanvas(nextNodes, get().edges);
     set({ nodes: nextNodes, lastSavedAt: Date.now() });
   },
-
   addChildNode: (parentId) => {
     const state = get();
     const pid = parentId || state.selectedNodeId || state.nodes[0]?.id;
     if (!pid) return;
-
     const parent = state.nodes.find((n) => n.id === pid);
     if (!parent) return;
-
     const existingChildren = state.edges.filter((e) => e.source === pid);
     const targetPos = calculateChildPosition(parent, existingChildren.length);
-    const newNode = createNewChildNode(pid, parent, 'topic', targetPos);
+    const newNode = createNewChildNode(pid, parent, "topic", targetPos);
     const rawEdge = buildEdge(pid, newNode.id, state.connectorType, parent.data.color, parent.position, targetPos);
-
     const nextNodes = [...state.nodes, newNode];
     const nextEdges = optimizeEdgeHandles(nextNodes, [...state.edges, rawEdge]);
     persistCanvas(nextNodes, nextEdges);
-
     set({
       nodes: nextNodes,
       edges: nextEdges,
       selectedNodeId: newNode.id,
       history: [
         ...state.history.slice(0, state.historyIndex + 1),
-        { nodes: nextNodes, edges: nextEdges },
+        { nodes: nextNodes, edges: nextEdges }
       ],
       historyIndex: state.historyIndex + 1,
-      lastSavedAt: Date.now(),
+      lastSavedAt: Date.now()
     });
   },
-
   addSiblingNode: (nodeId) => {
     const state = get();
     const targetId = nodeId || state.selectedNodeId;
     if (!targetId) return;
-
     const targetNode = state.nodes.find((n) => n.id === targetId);
     if (!targetNode || !targetNode.data.parentId) return;
-
     const parent = state.nodes.find((n) => n.id === targetNode.data.parentId);
     if (!parent) return;
-
     const targetPos = calculateSiblingPosition(targetNode);
-    const newNode = createNewChildNode(parent.id, parent, 'topic', targetPos);
+    const newNode = createNewChildNode(parent.id, parent, "topic", targetPos);
     const rawEdge = buildEdge(parent.id, newNode.id, state.connectorType, parent.data.color, parent.position, targetPos);
-
     const nextNodes = [...state.nodes, newNode];
     const nextEdges = optimizeEdgeHandles(nextNodes, [...state.edges, rawEdge]);
     persistCanvas(nextNodes, nextEdges);
-
     set({
       nodes: nextNodes,
       edges: nextEdges,
       selectedNodeId: newNode.id,
       history: [
         ...state.history.slice(0, state.historyIndex + 1),
-        { nodes: nextNodes, edges: nextEdges },
+        { nodes: nextNodes, edges: nextEdges }
       ],
       historyIndex: state.historyIndex + 1,
-      lastSavedAt: Date.now(),
+      lastSavedAt: Date.now()
     });
   },
-
-  addCardAtPosition: (position, kind = 'topic') => {
+  addCardAtPosition: (position, kind = "topic") => {
     const state = get();
-    const newId = `card-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    const selectedParent = state.selectedNodeId
-      ? state.nodes.find((n) => n.id === state.selectedNodeId)
-      : null;
-
-    const cardColor = selectedParent?.data.color || '#d4d4d8';
-
-    const newNode: Node<MindNodeData> = {
+    const newId = `card-${Date.now()}-${Math.floor(Math.random() * 1e3)}`;
+    const selectedParent = state.selectedNodeId ? state.nodes.find((n) => n.id === state.selectedNodeId) : null;
+    const cardColor = selectedParent?.data.color || "#d4d4d8";
+    const newNode = {
       id: newId,
       type: kind,
       position,
       data: {
-        label: '',
+        label: "",
         kind,
         color: cardColor,
         parentId: selectedParent?.id,
-        shape: 'rounded',
-        priority: 'none',
+        shape: "rounded",
+        priority: "none",
         checklist: [],
-        markdown: '',
-      },
+        markdown: ""
+      }
     };
-
     let nextEdges = state.edges;
     if (selectedParent) {
       const rawEdge = buildEdge(
         selectedParent.id,
         newId,
         state.connectorType,
-        '#71717a',
+        "#71717a",
         selectedParent.position,
         position
       );
       nextEdges = optimizeEdgeHandles([...state.nodes, newNode], [...state.edges, rawEdge]);
     }
-
     const nextNodes = [...state.nodes, newNode];
     persistCanvas(nextNodes, nextEdges);
-
     set({
       nodes: nextNodes,
       edges: nextEdges,
       selectedNodeId: newId,
       history: [
         ...state.history.slice(0, state.historyIndex + 1),
-        { nodes: nextNodes, edges: nextEdges },
+        { nodes: nextNodes, edges: nextEdges }
       ],
       historyIndex: state.historyIndex + 1,
-      lastSavedAt: Date.now(),
+      lastSavedAt: Date.now()
     });
   },
-
   deleteSubtree: (nodeId) => {
     const state = get();
     const targetNode = state.nodes.find((n) => n.id === nodeId);
-    if (!targetNode || targetNode.data.kind === 'root') return;
-
+    if (!targetNode || targetNode.data.kind === "root") return;
     const toDelete = getAllDescendantIds(nodeId, state.edges);
     toDelete.add(nodeId);
-
     const nextNodes = state.nodes.filter((n) => !toDelete.has(n.id));
     const nextEdges = state.edges.filter((e) => !toDelete.has(e.source) && !toDelete.has(e.target));
     persistCanvas(nextNodes, nextEdges);
-
     set({
       nodes: nextNodes,
       edges: nextEdges,
       selectedNodeId: null,
       history: [
         ...state.history.slice(0, state.historyIndex + 1),
-        { nodes: nextNodes, edges: nextEdges },
+        { nodes: nextNodes, edges: nextEdges }
       ],
       historyIndex: state.historyIndex + 1,
-      lastSavedAt: Date.now(),
+      lastSavedAt: Date.now()
     });
   },
-
   toggleCollapse: (nodeId) => {
     const state = get();
     const targetNode = state.nodes.find((n) => n.id === nodeId);
     if (!targetNode) return;
-
     const isCollapsed = !targetNode.data.collapsed;
     const descendantIds = getAllDescendantIds(nodeId, state.edges);
-
     const nextNodes = state.nodes.map((n) => {
       if (n.id === nodeId) return { ...n, data: { ...n.data, collapsed: isCollapsed } };
       if (descendantIds.has(n.id)) return { ...n, hidden: isCollapsed };
       return n;
     });
-
     const nextEdges = state.edges.map((e) => {
       if (descendantIds.has(e.target)) return { ...e, hidden: isCollapsed };
       return e;
     });
-
     persistCanvas(nextNodes, nextEdges);
     set({ nodes: nextNodes, edges: nextEdges, lastSavedAt: Date.now() });
   },
-
   applyLayout: (direction) => {
     const state = get();
     const nextDir = direction || state.layoutDirection;
     const layoutResult = runMindMapLayout(state.nodes, state.edges, nextDir);
     persistCanvas(layoutResult.nodes, layoutResult.edges);
-
     set({
       nodes: layoutResult.nodes,
       edges: layoutResult.edges,
       layoutDirection: nextDir,
       history: [
         ...state.history.slice(0, state.historyIndex + 1),
-        { nodes: layoutResult.nodes, edges: layoutResult.edges },
+        { nodes: layoutResult.nodes, edges: layoutResult.edges }
       ],
       historyIndex: state.historyIndex + 1,
-      lastSavedAt: Date.now(),
+      lastSavedAt: Date.now()
     });
   },
-
-  setConnectorType: (type: ConnectorType) => {
+  setConnectorType: (type) => {
     const nextEdges = get().edges.map((e) => ({ ...e, type }));
     persistCanvas(get().nodes, nextEdges);
     set({ edges: nextEdges, connectorType: type, lastSavedAt: Date.now() });
   },
-
   undo: () => {
     const { history, historyIndex } = get();
     if (historyIndex > 0) {
@@ -276,7 +235,6 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
       set({ nodes: prev.nodes, edges: prev.edges, historyIndex: historyIndex - 1, lastSavedAt: Date.now() });
     }
   },
-
   redo: () => {
     const { history, historyIndex } = get();
     if (historyIndex < history.length - 1) {
@@ -285,7 +243,6 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
       set({ nodes: next.nodes, edges: next.edges, historyIndex: historyIndex + 1, lastSavedAt: Date.now() });
     }
   },
-
   resetCanvas: () => {
     const nextEdges = optimizeEdgeHandles(initialNodes, initialEdges);
     persistCanvas(initialNodes, nextEdges);
@@ -295,51 +252,44 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
       selectedNodeId: null,
       history: [{ nodes: initialNodes, edges: nextEdges }],
       historyIndex: 0,
-      lastSavedAt: Date.now(),
+      lastSavedAt: Date.now()
     });
   },
-
   createBlankCanvas: () => {
-    const blankRoot: Node<MindNodeData> = {
-      id: 'root-1',
-      type: 'root',
+    const blankRoot = {
+      id: "root-1",
+      type: "root",
       position: { x: 400, y: 300 },
       data: {
-        label: 'Central Theme',
-        kind: 'root',
-        color: '#f4f4f5',
-        priority: 'high',
-      },
+        label: "Central Theme",
+        kind: "root",
+        color: "#f4f4f5",
+        priority: "high"
+      }
     };
     const nextNodes = [blankRoot];
-    const nextEdges: Edge[] = [];
+    const nextEdges = [];
     persistCanvas(nextNodes, nextEdges);
     set({
       nodes: nextNodes,
       edges: nextEdges,
-      selectedNodeId: 'root-1',
+      selectedNodeId: "root-1",
       history: [{ nodes: nextNodes, edges: nextEdges }],
       historyIndex: 0,
-      lastSavedAt: Date.now(),
+      lastSavedAt: Date.now()
     });
   },
-
   openSearch: () => set({ isSearchOpen: true }),
   closeSearch: () => set({ isSearchOpen: false }),
   focusNode: (id) => set({ selectedNodeId: id, isSearchOpen: false }),
-
   duplicateSubtree: (nodeId) => {
     const state = get();
     const targetId = nodeId || state.selectedNodeId;
     if (!targetId) return;
-
     const targetNode = state.nodes.find((n) => n.id === targetId);
-    if (!targetNode || targetNode.data.kind === 'root') return;
-
+    if (!targetNode || targetNode.data.kind === "root") return;
     const cloned = cloneSubtree(targetId, state.nodes, state.edges, { x: 40, y: 80 });
     let nextEdges = [...state.edges, ...cloned.edges];
-
-    // If target has a parent, connect the clone root to the same parent
     const parentEdge = state.edges.find((e) => e.target === targetId);
     if (parentEdge) {
       const bridgeEdge = buildEdge(
@@ -352,61 +302,50 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
       );
       nextEdges.push(bridgeEdge);
     }
-
     const nextNodes = [...state.nodes, ...cloned.nodes];
     const optimizedEdges = optimizeEdgeHandles(nextNodes, nextEdges);
     persistCanvas(nextNodes, optimizedEdges);
-
     set({
       nodes: nextNodes,
       edges: optimizedEdges,
       selectedNodeId: cloned.newRootId,
       history: [
         ...state.history.slice(0, state.historyIndex + 1),
-        { nodes: nextNodes, edges: optimizedEdges },
+        { nodes: nextNodes, edges: optimizedEdges }
       ],
       historyIndex: state.historyIndex + 1,
-      lastSavedAt: Date.now(),
+      lastSavedAt: Date.now()
     });
   },
-
   copySubtree: (nodeId) => {
     const state = get();
     const targetId = nodeId || state.selectedNodeId;
     if (!targetId) return;
-
     const descendantIds = getAllDescendantIds(targetId, state.edges);
-    const targetIds = new Set<string>([targetId, ...descendantIds]);
-
+    const targetIds = /* @__PURE__ */ new Set([targetId, ...descendantIds]);
     const subNodes = state.nodes.filter((n) => targetIds.has(n.id));
     const subEdges = state.edges.filter((e) => targetIds.has(e.source) && targetIds.has(e.target));
-
     set({
       clipboard: {
         rootId: targetId,
         nodes: subNodes,
         edges: subEdges,
-        copiedAt: Date.now(),
-      },
+        copiedAt: Date.now()
+      }
     });
   },
-
   pasteSubtree: (targetParentId) => {
     const state = get();
     if (!state.clipboard) return;
-
     const parentId = targetParentId || state.selectedNodeId;
     const parentNode = parentId ? state.nodes.find((n) => n.id === parentId) : null;
-
     const cloned = cloneSubtree(
       state.clipboard.rootId,
       state.clipboard.nodes,
       state.clipboard.edges,
       { x: parentNode ? 240 : 60, y: parentNode ? 40 : 60 }
     );
-
     let nextEdges = [...state.edges, ...cloned.edges];
-
     if (parentNode) {
       const bridgeEdge = buildEdge(
         parentNode.id,
@@ -418,73 +357,65 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
       );
       nextEdges.push(bridgeEdge);
     }
-
     const nextNodes = [...state.nodes, ...cloned.nodes];
     const optimizedEdges = optimizeEdgeHandles(nextNodes, nextEdges);
     persistCanvas(nextNodes, optimizedEdges);
-
     set({
       nodes: nextNodes,
       edges: optimizedEdges,
       selectedNodeId: cloned.newRootId,
       history: [
         ...state.history.slice(0, state.historyIndex + 1),
-        { nodes: nextNodes, edges: optimizedEdges },
+        { nodes: nextNodes, edges: optimizedEdges }
       ],
       historyIndex: state.historyIndex + 1,
-      lastSavedAt: Date.now(),
+      lastSavedAt: Date.now()
     });
   },
-
   deleteEdge: (edgeId) => {
     const state = get();
     const nextEdges = state.edges.filter((e) => e.id !== edgeId);
     persistCanvas(state.nodes, nextEdges);
-
     set({
       edges: nextEdges,
       history: [
         ...state.history.slice(0, state.historyIndex + 1),
-        { nodes: state.nodes, edges: nextEdges },
+        { nodes: state.nodes, edges: nextEdges }
       ],
       historyIndex: state.historyIndex + 1,
-      lastSavedAt: Date.now(),
+      lastSavedAt: Date.now()
     });
   },
-
   openProjectModal: () => set({ isProjectModalOpen: true }),
   closeProjectModal: () => set({ isProjectModalOpen: false }),
-
   switchProject: (projectId) => {
     const loaded = loadProjectData(projectId);
     if (loaded && Array.isArray(loaded.nodes) && Array.isArray(loaded.edges)) {
-      persistCanvas(loaded.nodes as any, loaded.edges as any);
+      persistCanvas(loaded.nodes, loaded.edges);
       set({
         activeProjectId: projectId,
-        nodes: loaded.nodes as any,
-        edges: loaded.edges as any,
+        nodes: loaded.nodes,
+        edges: loaded.edges,
         selectedNodeId: null,
-        history: [{ nodes: loaded.nodes as any, edges: loaded.edges as any }],
+        history: [{ nodes: loaded.nodes, edges: loaded.edges }],
         historyIndex: 0,
-        lastSavedAt: Date.now(),
+        lastSavedAt: Date.now()
       });
     }
   },
-
   createProject: (name) => {
     const newId = `proj-${Date.now()}`;
-    const blankRoot: any = {
-      id: 'root-1',
-      type: 'root',
+    const blankRoot = {
+      id: "root-1",
+      type: "root",
       position: { x: 400, y: 300 },
       data: {
         label: name,
-        kind: 'root',
-        color: '#f4f4f5',
-        priority: 'high',
-      },
+        kind: "root",
+        color: "#f4f4f5",
+        priority: "high"
+      }
     };
-
     saveProjectData(newId, [blankRoot], []);
     const projects = getProjectList();
     projects.push({
@@ -492,34 +423,30 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
       name,
       nodeCount: 1,
       createdAt: Date.now(),
-      updatedAt: Date.now(),
+      updatedAt: Date.now()
     });
     saveProjectMetaList(projects);
-
     persistCanvas([blankRoot], []);
     set({
       activeProjectId: newId,
       nodes: [blankRoot],
       edges: [],
-      selectedNodeId: 'root-1',
+      selectedNodeId: "root-1",
       history: [{ nodes: [blankRoot], edges: [] }],
       historyIndex: 0,
-      lastSavedAt: Date.now(),
+      lastSavedAt: Date.now()
     });
   },
-
   deleteProject: (projectId) => {
     removeProjectData(projectId);
     const projects = getProjectList().filter((p) => p.id !== projectId);
     saveProjectMetaList(projects);
-
     const state = get();
     if (state.activeProjectId === projectId) {
       state.resetCanvas();
-      set({ activeProjectId: 'default' });
+      set({ activeProjectId: "default" });
     }
   },
-
   importMindMap: (nodes, edges) => {
     const nextEdges = optimizeEdgeHandles(nodes, edges);
     persistCanvas(nodes, nextEdges);
@@ -529,7 +456,10 @@ export const useMindMapStore = create<MindMapStoreState>((set, get) => ({
       selectedNodeId: null,
       history: [{ nodes, edges: nextEdges }],
       historyIndex: 0,
-      lastSavedAt: Date.now(),
+      lastSavedAt: Date.now()
     });
-  },
+  }
 }));
+export {
+  useMindMapStore
+};

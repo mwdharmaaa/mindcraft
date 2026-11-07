@@ -1,0 +1,122 @@
+import { Position } from "@xyflow/react";
+const initialNodes = [
+  {
+    id: "root-1",
+    type: "root",
+    position: { x: 380, y: 280 },
+    sourcePosition: Position.Right,
+    targetPosition: Position.Left,
+    data: {
+      label: "Main Story Arc",
+      kind: "root",
+      color: "#f4f4f5",
+      priority: "high"
+    }
+  },
+  {
+    id: "topic-1",
+    type: "topic",
+    position: { x: 700, y: 160 },
+    sourcePosition: Position.Right,
+    targetPosition: Position.Left,
+    data: {
+      label: "Act 1: The Inciting Incident",
+      kind: "topic",
+      color: "#e4e4e7",
+      shape: "rounded",
+      priority: "high",
+      parentId: "root-1"
+    }
+  },
+  {
+    id: "checklist-1",
+    type: "checklist",
+    position: { x: 1020, y: 120 },
+    sourcePosition: Position.Right,
+    targetPosition: Position.Left,
+    data: {
+      label: "Act 1 Deliverables",
+      kind: "checklist",
+      color: "#d4d4d8",
+      checklist: [
+        { id: "1", text: "Introduce world rules", completed: true },
+        { id: "2", text: "Catalyst dilemma", completed: true },
+        { id: "3", text: "Cross first threshold", completed: false }
+      ],
+      parentId: "topic-1"
+    }
+  },
+  {
+    id: "topic-2",
+    type: "topic",
+    position: { x: 700, y: 390 },
+    sourcePosition: Position.Right,
+    targetPosition: Position.Left,
+    data: {
+      label: "Act 2: Rising Stakes",
+      kind: "topic",
+      color: "#e4e4e7",
+      shape: "pill",
+      priority: "medium",
+      parentId: "root-1"
+    }
+  },
+  {
+    id: "markdown-1",
+    type: "markdown",
+    position: { x: 1020, y: 370 },
+    sourcePosition: Position.Right,
+    targetPosition: Position.Left,
+    data: {
+      label: "Worldbuilding & Lore",
+      kind: "markdown",
+      color: "#d4d4d8",
+      markdown: "The kingdom is divided by an ancient barrier that only awakens during solar alignment.",
+      parentId: "topic-2"
+    }
+  }
+];
+const initialEdges = [
+  {
+    id: "e-root-topic1",
+    source: "root-1",
+    target: "topic-1",
+    sourceHandle: "source-r",
+    targetHandle: "target-l",
+    type: "smoothstep",
+    animated: true,
+    style: { stroke: "#a1a1aa", strokeWidth: 1.5 }
+  },
+  {
+    id: "e-topic1-chk",
+    source: "topic-1",
+    target: "checklist-1",
+    sourceHandle: "source-r",
+    targetHandle: "target-l",
+    type: "smoothstep",
+    style: { stroke: "#71717a", strokeWidth: 1.5 }
+  },
+  {
+    id: "e-root-topic2",
+    source: "root-1",
+    target: "topic-2",
+    sourceHandle: "source-r",
+    targetHandle: "target-l",
+    type: "smoothstep",
+    animated: true,
+    style: { stroke: "#a1a1aa", strokeWidth: 1.5 }
+  },
+  {
+    id: "e-topic2-md",
+    source: "topic-2",
+    target: "markdown-1",
+    sourceHandle: "source-r",
+    targetHandle: "target-l",
+    type: "smoothstep",
+    style: { stroke: "#71717a", strokeWidth: 1.5 }
+  }
+];
+export {
+  initialEdges,
+  initialNodes
+};
