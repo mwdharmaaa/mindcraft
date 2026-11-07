@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 import { serializeToJson, deserializeFromJson } from '@/features/persistence/formatters/jsonSchema';
-import { serializeToMarkdown } from '@/features/persistence/formatters/markdownParser';
-import { X, Copy, Check, Download, Upload } from 'lucide-react';
+import { serializeToMarkdown, deserializeFromMarkdown } from '@/features/persistence/formatters/markdownParser';
+import { X, Copy, Check, Download, Upload, FileCode } from 'lucide-react';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -28,14 +28,41 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleDownloadFile = () => {
+    const ext = tab === 'json' ? 'json' : 'md';
+    const mime = tab === 'json' ? 'application/json' : 'text/markdown';
+    const blob = new Blob([activeContent], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = `mindcraft-map-${Date.now()}.${ext}`;
+    link.href = url;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleExportPng = async () => {
     const viewport = document.querySelector('.react-flow__viewport') as HTMLElement;
-    if (!viewport) return;
+    if (!viewport || nodes.length === 0) return;
     try {
       const { toPng } = await import('html-to-image');
+      const minX = Math.min(...nodes.map((n) => n.position.x));
+      const minY = Math.min(...nodes.map((n) => n.position.y));
+      const maxX = Math.max(...nodes.map((n) => n.position.x + 280));
+      const maxY = Math.max(...nodes.map((n) => n.position.y + 160));
+      const padding = 70;
+      const captureWidth = Math.max(maxX - minX + padding * 2, 800);
+      const captureHeight = Math.max(maxY - minY + padding * 2, 600);
+
       const dataUrl = await toPng(viewport, {
         backgroundColor: '#09090b',
         quality: 0.95,
+        width: captureWidth,
+        height: captureHeight,
+        style: {
+          width: `${captureWidth}px`,
+          height: `${captureHeight}px`,
+          transform: `translate(${-minX + padding}px, ${-minY + padding}px) scale(1)`,
+        },
       });
       const link = document.createElement('a');
       link.download = `mindcraft-map-${Date.now()}.png`;
@@ -48,13 +75,29 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
 
   const handleImport = () => {
     setImportError(null);
-    const parsed = deserializeFromJson(importText.trim());
-    if (!parsed) {
-      setImportError('Invalid MindCraft JSON payload.');
+    const trimmed = importText.trim();
+    if (!trimmed) {
+      setImportError('Please enter valid JSON schema or Markdown outline.');
       return;
     }
-    importMindMap(parsed.nodes, parsed.edges);
-    onClose();
+
+    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+      const jsonResult = deserializeFromJson(trimmed);
+      if (jsonResult) {
+        importMindMap(jsonResult.nodes, jsonResult.edges);
+        onClose();
+        return;
+      }
+    }
+
+    const mdResult = deserializeFromMarkdown(trimmed);
+    if (mdResult && mdResult.nodes.length > 0) {
+      importMindMap(mdResult.nodes, mdResult.edges);
+      onClose();
+      return;
+    }
+
+    setImportError('Invalid format. Paste valid MindCraft JSON schema or Markdown outline.');
   };
 
   return (
@@ -78,7 +121,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
                 tab === t ? 'border-zinc-200 text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-200'
               }`}
             >
-              {t}
+              {t === 'import' ? 'Import (JSON / MD)' : t}
             </button>
           ))}
         </div>
@@ -86,20 +129,23 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
         <div className="p-5 flex-1 overflow-y-auto">
           {tab === 'import' ? (
             <div className="space-y-3">
+              <div className="text-[11px] text-zinc-400">
+                Paste MindCraft JSON or Markdown bullet list (e.g. <span className="font-mono text-zinc-300"># Title</span> or <span className="font-mono text-zinc-300">- Child item</span>) to generate a mind map.
+              </div>
               <textarea
                 value={importText}
                 onChange={(e) => setImportText(e.target.value)}
-                placeholder="Paste valid MindCraft JSON schema..."
-                rows={8}
+                placeholder={"# Central Idea\n- Inciting Incident\n  - Introduce world\n  - [ ] Action item\n  - **Notes**: Additional lore"}
+                rows={9}
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-xs text-zinc-200 font-mono outline-none focus:border-zinc-400"
               />
-              {importError && <p className="text-xs text-zinc-400 font-mono">{importError}</p>}
+              {importError && <p className="text-xs text-rose-400 font-mono">{importError}</p>}
               <button
                 onClick={handleImport}
                 className="flex items-center gap-2 px-4 py-2 bg-zinc-200 hover:bg-white text-zinc-950 rounded-lg text-xs font-semibold transition-colors"
               >
                 <Upload className="w-4 h-4" />
-                <span>Load Data</span>
+                <span>Parse and Load Map</span>
               </button>
             </div>
           ) : (
@@ -107,20 +153,27 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
               <pre className="p-3 bg-zinc-950 border border-zinc-800 rounded-lg text-xs text-zinc-300 font-mono max-h-60 overflow-auto">
                 {activeContent}
               </pre>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium border border-zinc-750 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium border border-zinc-700 transition-colors"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-zinc-200" /> : <Copy className="w-3.5 h-3.5 text-zinc-400" />}
-                  <span>{copied ? 'Copied' : 'Copy'}</span>
+                  <span>{copied ? 'Copied' : 'Copy Text'}</span>
+                </button>
+                <button
+                  onClick={handleDownloadFile}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium border border-zinc-700 transition-colors"
+                >
+                  <FileCode className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>Download .{tab === 'json' ? 'json' : 'md'}</span>
                 </button>
                 <button
                   onClick={handleExportPng}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-xs font-medium transition-colors"
                 >
                   <Download className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>Download PNG</span>
+                  <span>Download Full PNG</span>
                 </button>
               </div>
             </div>
