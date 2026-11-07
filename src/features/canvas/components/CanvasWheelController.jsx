@@ -16,11 +16,11 @@ const CanvasWheelController = () => {
       if (e.ctrlKey || e.metaKey || e.altKey) {
         const rawDelta = e.deltaMode === 1 ? e.deltaY * 18 : e.deltaMode === 2 ? e.deltaY * 50 : e.deltaY;
         const isDiscreteWheel = Math.abs(rawDelta) >= 45;
-        const ZOOM_MULTIPLIER = 1.5;
-        const PINCH_VELOCITY = 0.09 * ZOOM_MULTIPLIER;
+        // Calibrated so a single natural hand pinch gesture sweeps from 200% to 80% (ratio 0.4) smoothly
+        const PINCH_VELOCITY = 0.22;
         const normalizedDelta = isDiscreteWheel
-          ? Math.sign(rawDelta) * (0.48 * ZOOM_MULTIPLIER)
-          : Math.sign(rawDelta) * Math.min(Math.abs(rawDelta) * PINCH_VELOCITY, 1.2);
+          ? Math.sign(rawDelta) * 0.45
+          : Math.sign(rawDelta) * Math.min(Math.abs(rawDelta) * PINCH_VELOCITY, 0.95);
         const factor = Math.exp(-normalizedDelta);
         const nextZoom = Math.min(Math.max(viewport.zoom * factor, 0.15), 2.5);
 
