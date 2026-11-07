@@ -18,6 +18,7 @@ export interface MindMapStoreState {
   history: MindMapHistoryItem[];
   historyIndex: number;
   lastSavedAt: number | null;
+  isSearchOpen: boolean;
 
   onNodesChange: OnNodesChange<Node<MindNodeData>>;
   onEdgesChange: OnEdgesChange;
@@ -37,4 +38,7 @@ export interface MindMapStoreState {
   resetCanvas: () => void;
   createBlankCanvas: () => void;
   importMindMap: (nodes: Node<MindNodeData>[], edges: Edge[]) => void;
+  openSearch: () => void;
+  closeSearch: () => void;
+  focusNode: (id: string) => void;
 }
