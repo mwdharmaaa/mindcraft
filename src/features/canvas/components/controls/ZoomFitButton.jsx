@@ -1,0 +1,13 @@
+import { Maximize2 } from "lucide-react";
+const ZoomFitButton = ({ onClick }) => {
+  return <button
+    onClick={onClick}
+    className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+    title="Fit view (Ctrl+9)"
+  >
+      <Maximize2 className="w-3.5 h-3.5" />
+    </button>;
+};
+export {
+  ZoomFitButton
+};
