@@ -1,23 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
-import {
-  NodeShape,
-  NodeTypeKind,
-  NodePriority,
-} from '@/features/nodes/types/node.types';
-import { Trash2, Plus, GitBranch, Layers, Tag, X } from 'lucide-react';
-
-const COLOR_PALETTE = [
-  '#ffffff', // crisp white
-  '#f4f4f5', // zinc 100
-  '#e4e4e7', // zinc 200
-  '#d4d4d8', // zinc 300
-  '#a1a1aa', // zinc 400
-  '#71717a', // zinc 500
-  '#52525b', // zinc 600
-  '#3f3f46', // zinc 700
-  '#27272a', // zinc 800
-];
+import { Trash2, Plus, GitBranch, Layers } from 'lucide-react';
+import { ColorPalettePicker } from './inspector/ColorPalettePicker';
+import { CardTypeSelector } from './inspector/CardTypeSelector';
+import { CardShapeSelector } from './inspector/CardShapeSelector';
+import { PrioritySelector } from './inspector/PrioritySelector';
+import { TagManager } from './inspector/TagManager';
 
 export const NodeCustomizerPanel: React.FC = () => {
   const {
@@ -29,22 +17,17 @@ export const NodeCustomizerPanel: React.FC = () => {
     deleteSubtree,
   } = useMindMapStore();
 
-  const [tagInput, setTagInput] = useState('');
-
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
   if (!selectedNode) return null;
 
   const data = selectedNode.data;
   const isRoot = data.kind === 'root';
 
-  const handleAddTag = () => {
-    const clean = tagInput.trim().replace(/^#/, '');
-    if (!clean) return;
+  const handleAddTag = (newTag: string) => {
     const currentTags = data.tags || [];
-    if (!currentTags.includes(clean)) {
-      updateNodeData(selectedNode.id, { tags: [...currentTags, clean] });
+    if (!currentTags.includes(newTag)) {
+      updateNodeData(selectedNode.id, { tags: [...currentTags, newTag] });
     }
-    setTagInput('');
   };
 
   const handleRemoveTag = (targetTag: string) => {
@@ -74,126 +57,33 @@ export const NodeCustomizerPanel: React.FC = () => {
         )}
       </div>
 
-      <div className="space-y-1.5">
-        <label className="text-[11px] font-medium text-zinc-400">Accent Border</label>
-        <div className="flex items-center gap-2 flex-wrap">
-          {COLOR_PALETTE.map((hex) => (
-            <button
-              key={hex}
-              onClick={() => updateNodeData(selectedNode.id, { color: hex })}
-              className={`w-5 h-5 rounded-full border transition-transform ${
-                data.color === hex
-                  ? 'scale-125 border-white shadow-sm ring-2 ring-zinc-500/40'
-                  : 'border-zinc-700 hover:scale-110'
-              }`}
-              style={{ backgroundColor: hex }}
-            />
-          ))}
-        </div>
-      </div>
+      <ColorPalettePicker
+        currentColor={data.color}
+        onSelectColor={(color) => updateNodeData(selectedNode.id, { color })}
+      />
 
       {!isRoot && (
         <>
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-medium text-zinc-400">Card Type</label>
-            <div className="grid grid-cols-3 gap-1 bg-zinc-800/80 p-1 rounded-lg border border-zinc-700">
-              {(['topic', 'checklist', 'markdown'] as NodeTypeKind[]).map((kind) => (
-                <button
-                  key={kind}
-                  onClick={() => updateNodeData(selectedNode.id, { kind })}
-                  className={`text-xs py-1 rounded capitalize font-medium transition-all ${
-                    data.kind === kind
-                      ? 'bg-zinc-700 text-zinc-100 shadow'
-                      : 'text-zinc-400 hover:text-zinc-200'
-                  }`}
-                >
-                  {kind === 'topic' ? 'Card' : kind === 'markdown' ? 'Note' : 'Checklist'}
-                </button>
-              ))}
-            </div>
-          </div>
+          <CardTypeSelector
+            currentKind={data.kind}
+            onSelectKind={(kind) => updateNodeData(selectedNode.id, { kind })}
+          />
 
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-medium text-zinc-400">Shape</label>
-            <div className="grid grid-cols-3 gap-1 bg-zinc-800/80 p-1 rounded-lg border border-zinc-700">
-              {(['rounded', 'pill', 'rectangle'] as NodeShape[]).map((shape) => (
-                <button
-                  key={shape}
-                  onClick={() => updateNodeData(selectedNode.id, { shape })}
-                  className={`text-xs py-1 rounded capitalize font-medium transition-all ${
-                    (data.shape || 'rounded') === shape
-                      ? 'bg-zinc-700 text-zinc-100 shadow'
-                      : 'text-zinc-400 hover:text-zinc-200'
-                  }`}
-                >
-                  {shape}
-                </button>
-              ))}
-            </div>
-          </div>
+          <CardShapeSelector
+            currentShape={data.shape}
+            onSelectShape={(shape) => updateNodeData(selectedNode.id, { shape })}
+          />
 
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-medium text-zinc-400">Priority</label>
-            <div className="flex items-center gap-1">
-              {(['none', 'low', 'medium', 'high', 'urgent'] as NodePriority[]).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => updateNodeData(selectedNode.id, { priority: p })}
-                  className={`px-2 py-0.5 text-[10px] uppercase font-mono rounded transition-colors ${
-                    (data.priority || 'none') === p
-                      ? 'bg-zinc-200 text-zinc-950 font-bold shadow-sm'
-                      : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700/60'
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-          </div>
+          <PrioritySelector
+            currentPriority={data.priority}
+            onSelectPriority={(priority) => updateNodeData(selectedNode.id, { priority })}
+          />
 
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1">
-                <Tag className="w-3 h-3 text-zinc-400" />
-                <span>Tags</span>
-              </label>
-            </div>
-            {data.tags && data.tags.length > 0 && (
-              <div className="flex items-center gap-1 flex-wrap">
-                {data.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="flex items-center gap-1 text-[10px] font-mono bg-zinc-800 text-zinc-300 px-1.5 py-0.5 rounded border border-zinc-700"
-                  >
-                    <span>#{tag}</span>
-                    <button
-                      onClick={() => handleRemoveTag(tag)}
-                      className="text-zinc-500 hover:text-zinc-200"
-                    >
-                      <X className="w-2.5 h-2.5" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-            <div className="flex items-center gap-1">
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-                placeholder="Add tag..."
-                className="flex-1 bg-zinc-800 text-zinc-100 text-xs px-2 py-1 rounded border border-zinc-700 outline-none focus:border-zinc-400 placeholder:text-zinc-500"
-              />
-              <button
-                onClick={handleAddTag}
-                className="p-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded border border-zinc-700"
-                title="Add tag"
-              >
-                <Plus className="w-3 h-3" />
-              </button>
-            </div>
-          </div>
+          <TagManager
+            tags={data.tags}
+            onAddTag={handleAddTag}
+            onRemoveTag={handleRemoveTag}
+          />
         </>
       )}
 
