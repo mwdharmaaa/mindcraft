@@ -5,10 +5,11 @@ import { NodeCustomizerPanel } from '@/features/toolbar/components/NodeCustomize
 import { ExportModal } from '@/features/toolbar/components/ExportModal';
 import { ShortcutsDialog } from '@/features/toolbar/components/ShortcutsDialog';
 import { SearchModal } from '@/features/search/components/SearchModal';
+import { ProjectListModal } from '@/features/projects/components/ProjectListModal';
 import { useMindMapStore } from '@/features/canvas/store/mindMapStore';
 
 export const App: React.FC = () => {
-  const { isSearchOpen, closeSearch } = useMindMapStore();
+  const { isSearchOpen, closeSearch, isProjectModalOpen, closeProjectModal } = useMindMapStore();
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
 
@@ -36,6 +37,11 @@ export const App: React.FC = () => {
       <SearchModal
         isOpen={isSearchOpen}
         onClose={closeSearch}
+      />
+
+      <ProjectListModal
+        isOpen={isProjectModalOpen}
+        onClose={closeProjectModal}
       />
     </main>
   );
